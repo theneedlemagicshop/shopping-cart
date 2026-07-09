@@ -320,6 +320,86 @@ const products = [
     image: "images/image40.png"
 },
 
+{
+    id: 41,
+    name: "Crochet Airpod Pocket ",
+    categories: ["Other"],
+    price: 299,
+    image: "images/image41.png"
+},
+
+{
+    id: 42,
+    name: "Crochet iPhone Pocket",
+    categories: ["Other"],
+    price: 449,
+    image: "images/image42.png"
+},
+
+{
+    id: 43,
+    name: "Crochet Heart Button Cover <br> (Set of 6)",
+    categories: ["Accessories"],
+    price: 199,
+    image: "images/image43.png"
+},
+
+{
+    id: 44,
+    name: "Crochet Butterfly Button Cover <br> (Set of 6)",
+    categories: ["Accessories"],
+    price: 199,
+    image: "images/image44.png"
+},
+
+{
+    id: 45,
+    name: "Crochet Bow Button Cover <br> (Set of 6)",
+    categories: ["Accessories"],
+    price: 199,
+    image: "images/image45.png"
+},
+
+{
+    id: 46,
+    name: "Crochet Gajra",
+    categories: ["Hair Accessories", "Flower"],
+    price: 299,
+    image: "images/image46.png"
+},
+
+{
+    id: 47,
+    name: "Crochet Flower Pouch",
+    categories: ["Bag", "Flower"],
+    price: 299,
+    image: "images/image47.png"
+},
+
+{
+    id: 48,
+    name: "Crochet Safety Pin Brooch (PRADA)",
+    categories: ["Accessories"],
+    price: 199,
+    image: "images/image48.png"
+},
+
+{
+    id: 49,
+    name: "Crochet Sunflower Lipbalm Cover",
+    categories: ["Accessories", "Flower"],
+    price: 299,
+    image: "images/image49.png"
+},
+
+{
+    id: 50,
+    name: "Crochet Hair Scrunchie",
+    categories: ["Hair Accessories"],
+    price: 199,
+    image: "images/image50.png"
+},
+
 ];
 
 let selectedCategory = "";
