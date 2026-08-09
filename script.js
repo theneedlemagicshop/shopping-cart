@@ -482,6 +482,264 @@ const products = [
 
 ];
 
+const productVideos = {
+
+    52: [
+        "https://www.youtube.com/watch?v=nrEgmJSZtgc"
+    ],
+
+    51: [
+        "https://www.youtube.com/watch?v=a1sRSw1Ozo4"
+    ],
+
+    16: [
+        "https://www.youtube.com/watch?v=jILaPMVQHms"
+    ],
+
+    1: [
+        "https://www.youtube.com/watch?v=5DR3-eRSRsA",
+        "https://www.youtube.com/watch?v=mKx_Qke2O5s"
+    ],
+
+    2: [
+        "https://www.youtube.com/watch?v=2hhOLXwsHoY"
+    ],
+
+    3: [
+        "https://www.youtube.com/watch?v=q_LcLGwYPq0",
+        "https://www.youtube.com/watch?v=mPrfv9G2wTU"
+    ],
+
+    4: [
+        "https://www.youtube.com/watch?v=YDkE4wF0PyA"
+    ],
+
+    5: [
+        "https://www.youtube.com/watch?v=OH9u0dVdV04"
+    ],
+
+    6: [
+        "https://www.youtube.com/watch?v=7tg1_d4HlRM",
+        "https://www.youtube.com/watch?v=jLR3dT6a01M"
+    ],
+
+    7: [
+        "https://www.youtube.com/watch?v=cXIU3pd44Mg",
+        "https://www.youtube.com/watch?v=qTPDK9CSPug",
+        "https://www.youtube.com/watch?v=59oG-TV-Pxo"
+    ],
+
+    8: [
+        "https://www.youtube.com/watch?v=VjURssV0Vko"
+    ],
+
+    9: [
+        "https://www.youtube.com/watch?v=WeIpzn-u5hs"
+    ],
+
+    10: [
+        "https://www.youtube.com/watch?v=j5wTw98Dtg4"
+    ],
+
+    11: [
+        "https://www.youtube.com/watch?v=MwDlW62SEQg"
+    ],
+
+    12: [
+        "https://www.youtube.com/watch?v=st8KxmuhAY8"
+    ],
+
+    13: [
+        "https://www.youtube.com/watch?v=NjGlPqh0_Fg"
+    ],
+
+    14: [
+        "https://www.youtube.com/watch?v=3tR4h62r-YU"
+    ],
+
+    15: [
+        "https://www.youtube.com/watch?v=hTgff8DoZHc"
+    ],
+
+    17: [
+        "https://www.youtube.com/watch?v=NFfJPar_3YE",
+        "https://www.youtube.com/watch?v=JX3H71J1vSQ",
+        "https://www.youtube.com/watch?v=KxAdjoEN2kE"
+    ],
+
+    18: [
+        "https://www.youtube.com/watch?v=2FzjauVkd6I",
+        "https://www.youtube.com/watch?v=5pPYJmd13To",
+        "https://www.youtube.com/watch?v=vs64av4GU9I",
+        "https://www.youtube.com/watch?v=uoDTcEZiZBA",
+        "https://www.youtube.com/watch?v=xEf27a2qcZM",
+        "https://www.youtube.com/watch?v=5NdJQGe2hx8"
+    ],
+
+    19: [
+        "https://www.youtube.com/watch?v=XJ3qRIuiw68"
+    ],
+
+    20: [
+        "https://www.youtube.com/watch?v=kUQ9h2ZQBvg"
+    ],
+
+    21: [
+        "https://www.youtube.com/watch?v=3PdvGTtwhOg"
+    ],
+
+    22: [
+        "https://www.youtube.com/watch?v=zImId3j1h6A"
+    ],
+
+    23: [
+        "https://www.youtube.com/watch?v=D-weJ8xUTPg"
+    ],
+
+    24: [
+        "https://www.youtube.com/watch?v=qV4Rp9wjdFs"
+    ],
+
+    25: [
+        "https://www.youtube.com/watch?v=PE8VTU8nits"
+    ],
+
+    26: [
+        "https://www.youtube.com/watch?v=HyAYtrOonic"
+    ],
+
+    27: [
+        "https://www.youtube.com/watch?v=jVGrrFxMr5k"
+    ],
+
+    28: [
+        "https://www.youtube.com/watch?v=ZdVPmNMSz3o"
+    ],
+
+    29: [
+        "https://www.youtube.com/watch?v=vuctQMWNOXY"
+    ],
+
+    30: [
+        "https://www.youtube.com/watch?v=rdzoNN3acIs"
+    ],
+
+    31: [
+        "https://www.youtube.com/watch?v=_gRClzfm6C4"
+    ],
+
+    32: [
+        "https://www.youtube.com/watch?v=kZi3JCVSTHU"
+    ],
+
+    33: [
+        "https://www.youtube.com/watch?v=KolGzL7onfU"
+    ],
+
+    34: [
+        "https://www.youtube.com/watch?v=bQtvBCMVcW8"
+    ],
+
+    35: [
+        "https://www.youtube.com/watch?v=wbCSvkUl1_0"
+    ],
+
+    36: [
+        "https://www.youtube.com/watch?v=cXpEuDQCzhQ"
+    ],
+
+    37: [
+        "https://www.youtube.com/watch?v=6VQD3HYBFl8"
+    ],
+
+    38: [
+        "https://www.youtube.com/watch?v=znI6LpzCCoo",
+        "https://www.youtube.com/watch?v=9lqqDNt_QzY"
+    ],
+
+    39: [
+        "https://www.youtube.com/watch?v=tOwLn0YNb3Y"
+    ],
+
+    40: [
+        "https://www.youtube.com/watch?v=-Vt-7oazfT8"
+    ],
+
+    41: [
+        "https://www.youtube.com/watch?v=4ytjt7qFUBg"
+    ],
+
+    42: [
+        "https://www.youtube.com/watch?v=n-SL81CoCSU"
+    ],
+
+    43: [
+        "https://www.youtube.com/watch?v=fLvEle0Ci-w"
+    ],
+
+    44: [
+        "https://www.youtube.com/watch?v=fLvEle0Ci-w"
+    ],
+
+    45: [
+        "https://www.youtube.com/watch?v=fLvEle0Ci-w"
+    ],
+
+    46: [
+        "https://www.youtube.com/watch?v=IQ569nGNTwk"
+    ],
+
+    47: [
+        "https://www.youtube.com/watch?v=YGSeKOVM7UA"
+    ],
+
+    48: [
+        "https://www.youtube.com/watch?v=CZvHHG8DuBo"
+    ],
+
+    49: [
+        "https://www.youtube.com/watch?v=YrgFMDvI2j4"
+    ],
+
+    50: [
+        "https://www.youtube.com/watch?v=2TyDqQgw35o"
+    ],
+
+    53: [
+        "https://www.youtube.com/watch?v=kdLhfKQ3jEQ"
+    ],
+
+    54: [
+        "https://www.youtube.com/watch?v=1DkO0bugh94"
+    ],
+
+    55: [
+        "https://www.youtube.com/watch?v=75roBPUCT_M"
+    ],
+
+    56: [
+        "https://www.youtube.com/watch?v=PnNX7cFy2lY"
+    ],
+
+    57: [
+        "https://www.youtube.com/watch?v=xrFYV8RuBFk"
+    ],
+
+    58: [
+        "https://www.youtube.com/watch?v=qiCRqKR95FE"
+    ],
+
+    59: [
+        "https://www.youtube.com/watch?v=PEOMjyqP6TE"
+    ],
+
+    60: [
+        "https://www.youtube.com/watch?v=Cq0HRtUIZtg"
+    ],
+
+};
+
+
 let selectedCategory = "";
 
 const allPrices = products.map(product => product.price);
@@ -522,13 +780,17 @@ function displayProducts(list = products){
 
             </div>
 
-            <button onclick="addToCart(${product.id})">
-                Add to Cart
-            </button>
+<button onclick="addToCart(${product.id})">
+    Add to Cart
+</button>
 
-            <button class="buy-now" onclick="buyNow(${product.id})">
-                Buy Now
-            </button>
+<button class="buy-now" onclick="buyNow(${product.id})">
+    Buy Now
+</button>
+
+<button class="youtube-btn" onclick="openYouTube(${product.id})">
+    ▶ Video Tutorial
+</button>
 
         </div>
         `;
@@ -1043,3 +1305,73 @@ function selectCategory(category) {
 
 }
 
+function openYouTube(productId) {
+
+    const videos = productVideos[productId];
+
+    // No video yet
+    if (!videos || videos.length === 0) {
+        showYouTubeModal([]);
+        return;
+    }
+
+    // Only one video → open it directly
+    if (videos.length === 1) {
+        window.open(videos[0], "_blank");
+        return;
+    }
+
+    // Two or more videos → show parts popup
+    showYouTubeModal(videos);
+}
+
+
+function showYouTubeModal(videos) {
+
+    const modal = document.getElementById("youtube-modal");
+    const videoList = document.getElementById("youtube-video-list");
+
+    videoList.innerHTML = "";
+
+    // No video available
+    if (videos.length === 0) {
+
+        const message = document.createElement("p");
+
+        message.textContent = "YouTube video coming soon!";
+
+        message.className = "youtube-coming-soon";
+
+        videoList.appendChild(message);
+
+    } else {
+
+        videos.forEach((video, index) => {
+
+            const button = document.createElement("button");
+
+            button.className = "youtube-part-btn";
+
+            button.innerHTML = `▶ Part ${index + 1}`;
+
+            button.onclick = function () {
+
+                window.open(video, "_blank");
+
+                closeYouTubeModal();
+
+            };
+
+            videoList.appendChild(button);
+
+        });
+
+    }
+
+    modal.style.display = "flex";
+}
+
+
+function closeYouTubeModal() {
+    document.getElementById("youtube-modal").style.display = "none";
+}
