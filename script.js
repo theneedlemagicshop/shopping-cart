@@ -1,6 +1,22 @@
 const products = [
 
 {
+    id: 52,
+    name: "Crochet Pineapple Bag",
+    categories: ["Bag"],
+    price: 0,
+    image: "images/image52.png"
+},
+
+{
+    id: 51,
+    name: "Crochet Earrings (Set of 2)",
+    categories: ["Accessories"],
+    price: 0,
+    image: "images/image51.png"
+},
+
+{
     id: 16,
     name: "Crochet Lily Flower",
     categories: ["Flower", "Home Decor"],
