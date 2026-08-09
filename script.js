@@ -4,7 +4,7 @@ const products = [
     id: 52,
     name: "Crochet Pineapple Bag",
     categories: ["Bag"],
-    price: 0,
+    price: 399,
     image: "images/image52.png"
 },
 
@@ -12,7 +12,7 @@ const products = [
     id: 51,
     name: "Crochet Earrings (Set of 2)",
     categories: ["Accessories"],
-    price: 0,
+    price: 299,
     image: "images/image51.png"
 },
 
@@ -414,6 +414,70 @@ const products = [
     categories: ["Hair Accessories"],
     price: 199,
     image: "images/image50.png"
+},
+
+{
+    id: 53,
+    name: "Crochet Flower Button Cover <br> (Set of 6)",
+    categories: ["Accessories"],
+    price: 199,
+    image: "images/image53.png"
+},
+
+{
+    id: 54,
+    name: "Crochet Rose Hairpin",
+    categories: ["Hair Accessories","Flower"],
+    price: 199,
+    image: "images/image54.png"
+},
+
+{
+    id: 55,
+    name: "Crochet Evil Eye Charm",
+    categories: ["Home Decor"],
+    price: 349,
+    image: "images/image55.png"
+},
+
+{
+    id: 56,
+    name: "Crochet Rose Gajra",
+    categories: ["Hair Accessories", "Flower"],
+    price: 299,
+    image: "images/image56.png"
+},
+
+{
+    id: 57,
+    name: "Crochet Bookmark",
+    categories: ["Other"],
+    price: 199,
+    image: "images/image57.png"
+},
+
+{
+    id: 58,
+    name: "Crochet Specs Cover",
+    categories: ["Accessories"],
+    price: 249,
+    image: "images/image58.png"
+},
+
+{
+    id: 59,
+    name: "Crochet Flower",
+    categories: ["Flower"],
+    price: 199,
+    image: "images/image59.png"
+},
+
+{
+    id: 60,
+    name: "Crochet Bun Cover",
+    categories: ["Hair Accessories"],
+    price: 249,
+    image: "images/image60.png"
 },
 
 ];
