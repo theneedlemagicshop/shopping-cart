@@ -244,7 +244,7 @@ const products = [
     id: 28,
     name: "Crochet Puff Stitch Flower",
     categories: ["Flower"],
-    price: 99,
+    price: 199,
     image: "images/image28.png"
 },
 
@@ -308,7 +308,7 @@ const products = [
     id: 36,
     name: "Crochet Mini Santa Cap",
     categories: ["Home Decor"],
-    price: 99,
+    price: 199,
     image: "images/image36.png"
 },
 
@@ -332,7 +332,7 @@ const products = [
     id: 39,
     name: "Crochet Santa Applique",
     categories: ["Home Decor"],
-    price: 99,
+    price: 199,
     image: "images/image39.png"
 },
 
@@ -778,7 +778,10 @@ function displayProducts(list = products){
         productsDiv.innerHTML += `
         <div class="product">
 
-            <img src="${product.image}" class="product-image">
+            <img
+    src="${product.image}"
+    class="product-image"
+    onclick="openImageModal('${product.image}')">
 
             <div class="product-content">
 
@@ -1386,4 +1389,22 @@ function showYouTubeModal(videos) {
 
 function closeYouTubeModal() {
     document.getElementById("youtube-modal").style.display = "none";
+}
+
+function openImageModal(imageSrc) {
+
+    const modal = document.getElementById("image-modal");
+    const image = document.getElementById("expanded-image");
+
+    image.src = imageSrc;
+
+    modal.style.display = "flex";
+}
+
+
+function closeImageModal() {
+
+    document.getElementById("image-modal").style.display = "none";
+
+    document.getElementById("expanded-image").src = "";
 }
