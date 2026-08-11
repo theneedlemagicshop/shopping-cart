@@ -932,6 +932,8 @@ const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 cartCount.textContent = totalItems;
 
 localStorage.setItem("cart", JSON.stringify(cart));
+
+updateCartDrawer();
 }
 
 updateProducts();
@@ -1484,5 +1486,96 @@ function toggleFavorites() {
     }
 
     updateProducts();
+}
+
+function openCartDrawer() {
+
+    updateCartDrawer();
+
+    document.getElementById("cart-drawer").classList.add("open");
+    document.getElementById("cart-overlay").classList.add("open");
+
+}
+
+
+function closeCartDrawer() {
+
+    document.getElementById("cart-drawer").classList.remove("open");
+    document.getElementById("cart-overlay").classList.remove("open");
+
+}
+
+
+function updateCartDrawer() {
+
+    const drawerItems = document.getElementById("cart-drawer-items");
+    const drawerTotal = document.getElementById("drawer-total");
+
+    drawerItems.innerHTML = "";
+
+    let sum = 0;
+
+    if (cart.length === 0) {
+
+        drawerItems.innerHTML = `
+            <div class="drawer-empty">
+                🛒 Your cart is empty
+            </div>
+        `;
+
+        drawerTotal.textContent = "0";
+
+        return;
+    }
+
+    cart.forEach(item => {
+
+        sum += item.price * item.quantity;
+
+        drawerItems.innerHTML += `
+            <div class="drawer-cart-item">
+
+                <img src="${item.image}" alt="${item.name}">
+
+                <div class="drawer-cart-info">
+
+                    <div class="drawer-cart-name">
+                        ${item.name}
+                    </div>
+
+                    <div class="drawer-cart-price">
+                        ₹${item.price}
+                    </div>
+
+                    <div class="drawer-quantity">
+
+                        <button onclick="decrease(${item.id}); updateCartDrawer();">
+                            −
+                        </button>
+
+                        <span>
+                            ${item.quantity}
+                        </span>
+
+                        <button onclick="increase(${item.id}); updateCartDrawer();">
+                            +
+                        </button>
+
+                        <button class="drawer-remove"
+                                onclick="removeItem(${item.id}); updateCartDrawer();">
+                            ✕
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+
+    });
+
+    drawerTotal.textContent = sum;
+
 }
 

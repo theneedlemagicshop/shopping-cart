@@ -188,9 +188,38 @@
 </div>
 </div>
 
-<div id="floating-cart" onclick="scrollToCart()">
-🛒
-<span id="cart-count">0</span>
+<div id="floating-cart" onclick="openCartDrawer()">
+    🛒
+    <span id="cart-count">0</span>
+</div>
+
+<div id="cart-overlay" onclick="closeCartDrawer()"></div>
+
+<div id="cart-drawer">
+
+    <div class="cart-drawer-header">
+        <h2>🛒 Your Cart</h2>
+
+        <button class="cart-drawer-close" onclick="closeCartDrawer()">
+            ✕
+        </button>
+    </div>
+
+    <div id="cart-drawer-items"></div>
+
+    <div class="cart-drawer-footer">
+
+        <div class="cart-drawer-total">
+            <span>Total</span>
+            <strong>₹<span id="drawer-total">0</span></strong>
+        </div>
+
+        <button class="drawer-checkout-btn" onclick="closeCartDrawer(); checkout();">
+            Checkout
+        </button>
+
+    </div>
+
 </div>
 
 <div id="toast">
