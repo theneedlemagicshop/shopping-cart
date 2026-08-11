@@ -765,6 +765,10 @@ let selectedMaxPrice = highestPrice;
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
+let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+let showingFavorites = false;
+
 const productsDiv = document.getElementById("products");
 const cartItems = document.getElementById("cart-items");
 const total = document.getElementById("total");
@@ -778,11 +782,17 @@ function displayProducts(list = products){
         productsDiv.innerHTML += `
         <div class="product">
 
-            <img
-    src="${product.image}"
-    class="product-image"
-    onclick="openImageModal('${product.image}')">
+    <button
+        class="favorite-star ${favorites.includes(product.id) ? "favorited" : ""}"
+        onclick="toggleFavorite(${product.id}, event)"
+        aria-label="Add to favorites">
+        ${favorites.includes(product.id) ? "★" : "☆"}
+    </button>
 
+    <img
+src="${product.image}"
+class="product-image"
+onclick="openImageModal('${product.image}')">
             <div class="product-content">
 
                 <h2>${product.name}</h2>
@@ -1136,6 +1146,14 @@ function updateProducts() {
 
     let filtered = [...products];
 
+        if (showingFavorites) {
+
+        filtered = filtered.filter(product =>
+            favorites.includes(product.id)
+        );
+
+    }
+
     const search = document.getElementById("search").value.toLowerCase();
 
     if (search) {
@@ -1408,3 +1426,63 @@ function closeImageModal() {
 
     document.getElementById("expanded-image").src = "";
 }
+
+function toggleFavorite(id, event) {
+
+    event.stopPropagation();
+
+    if (favorites.includes(id)) {
+
+        favorites = favorites.filter(favoriteId => favoriteId !== id);
+
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+
+        updateProducts();
+
+    } else {
+
+        favorites.push(id);
+
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+
+        updateProducts();
+
+        const newStar = document.querySelector(
+            `.favorite-star[onclick*="toggleFavorite(${id}"]`
+        );
+
+        if (newStar) {
+
+            newStar.classList.add("favorite-sparkle");
+
+            setTimeout(() => {
+                newStar.classList.remove("favorite-sparkle");
+            }, 500);
+
+        }
+    }
+}
+
+
+function toggleFavorites() {
+
+    showingFavorites = !showingFavorites;
+
+    const button = document.getElementById("favorites-btn");
+
+    if (showingFavorites) {
+
+        button.classList.add("active");
+
+        button.textContent = "★ Favorites";
+
+    } else {
+
+        button.classList.remove("active");
+
+        button.textContent = "☆ Favorites";
+    }
+
+    updateProducts();
+}
+

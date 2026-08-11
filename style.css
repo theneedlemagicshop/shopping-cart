@@ -683,15 +683,6 @@ button:disabled{
     transform:translateX(-50%) translateY(0);
 }
 
-.product-image{
-    transition: transform .3s ease;
-    cursor: pointer;
-}
-
-.product:hover .product-image{
-    transform: scale(1.08);
-}
-
 @media (max-width: 768px) {
 
 body{
@@ -1198,5 +1189,109 @@ body{
     background:#cc0000;
 
     transform:scale(1.08);
+}
+
+/* Favorites Button */
+
+#favorites-btn {
+    width: auto;
+    padding: 12px 24px;
+    margin: 0;
+    background: white;
+    color: #555;
+    border: 2px solid #ddd;
+    transition: .2s;
+}
+
+#favorites-btn:hover {
+    transform: scale(1.04);
+    border-color: #aaa;
+}
+
+#favorites-btn.active {
+    background: #fff3b0;
+    color: #d4a900;
+    border-color: #f0c928;
+}
+
+
+/* Favorite Star */
+
+.product {
+    position: relative;
+}
+
+.favorite-star {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+
+    width: 42px;
+    height: 42px;
+
+    padding: 0;
+    margin: 0;
+
+    background: rgba(255,255,255,.95);
+    color: #999;
+
+    border: none;
+    border-radius: 50%;
+
+    font-size: 27px;
+    line-height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    z-index: 5;
+
+    box-shadow: 0 3px 10px rgba(0,0,0,.15);
+
+    transition:
+        color .2s ease,
+        transform .2s ease,
+        background .2s ease;
+}
+
+.favorite-star:hover {
+    transform: scale(1.12);
+    background: white;
+}
+
+.favorite-star.favorited {
+    color: #ffc400;
+}
+
+
+/* Sparkle animation */
+
+@keyframes favoriteSparkle {
+    0% {
+        transform: scale(1);
+    }
+
+    30% {
+        transform: scale(1.5) rotate(-10deg);
+    }
+
+    50% {
+        transform: scale(0.9) rotate(10deg);
+    }
+
+    70% {
+        transform: scale(1.25);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.favorite-sparkle {
+    animation: favoriteSparkle 0.5s ease;
 }
 
