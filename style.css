@@ -1876,3 +1876,42 @@ body{
         white-space: nowrap;
     }
 }
+
+@media (max-width: 480px) {
+
+    .store-header h1 {
+        font-size: 38px;
+        line-height: 1.1;
+    }
+
+    .store-header p {
+        font-size: 16px;
+    }
+
+    .top-controls {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+
+    #sort {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+
+        grid-column: 1 / -1;
+    }
+
+    #filter-btn,
+    #favorites-btn {
+        width: 100%;
+        margin: 0;
+        padding: 10px 8px;
+        font-size: 14px;
+    }
+
+}
+
