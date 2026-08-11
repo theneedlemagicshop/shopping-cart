@@ -1,6 +1,14 @@
 const products = [
 
 {
+    id: 61,
+    name: "Crochet Bandana",
+    categories: ["Hair Accessories"],
+    price: 499,
+    image: "images/image61.png"
+},
+
+{
     id: 52,
     name: "Crochet Pineapple Bag",
     categories: ["Bag"],
