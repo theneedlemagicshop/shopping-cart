@@ -1562,3 +1562,205 @@ body{
 
 }
 
+/* =========================
+   PRODUCT QUICK VIEW
+========================= */
+
+#quick-view-modal {
+    display: none;
+
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, .65);
+
+    z-index: 10005;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+}
+
+.quick-view-box {
+    position: relative;
+
+    width: 100%;
+    max-width: 850px;
+
+    max-height: 90vh;
+
+    background: white;
+
+    border-radius: 20px;
+
+    padding: 30px;
+
+    box-sizing: border-box;
+
+    display: flex;
+    gap: 35px;
+
+    align-items: center;
+
+    overflow-y: auto;
+
+    box-shadow: 0 15px 50px rgba(0, 0, 0, .35);
+
+    animation: quickViewIn .2s ease;
+}
+
+@keyframes quickViewIn {
+
+    from {
+        opacity: 0;
+        transform: scale(.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+}
+
+
+/* Product image */
+
+#quick-view-image {
+    width: 380px;
+    max-width: 45%;
+
+    aspect-ratio: 1 / 1;
+
+    object-fit: contain;
+
+    border-radius: 15px;
+
+    flex-shrink: 0;
+}
+
+
+/* Product details */
+
+.quick-view-details {
+    flex: 1;
+}
+
+.quick-view-details h2 {
+    margin: 0 0 10px;
+
+    font-size: 32px;
+
+    color: #222;
+}
+
+.quick-view-price {
+    font-size: 32px;
+
+    font-weight: bold;
+
+    color: #B12704;
+
+    margin: 15px 0;
+}
+
+
+/* Buttons */
+
+.quick-view-buttons {
+    margin-top: 20px;
+}
+
+.quick-view-buttons button {
+    width: 100%;
+
+    margin-top: 10px;
+
+    padding: 13px;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+
+    font-weight: 600;
+}
+
+
+/* Close button */
+
+.quick-view-close {
+    position: absolute;
+
+    top: 15px;
+    right: 15px;
+
+    width: 42px;
+    height: 42px;
+
+    padding: 0;
+    margin: 0;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #f1f1f1;
+
+    color: #555;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 2;
+}
+
+.quick-view-close:hover {
+    background: #ddd;
+
+    transform: scale(1.08);
+}
+
+
+/* Mobile */
+
+@media (max-width: 700px) {
+
+    .quick-view-box {
+        flex-direction: column;
+
+        gap: 15px;
+
+        padding: 25px 20px;
+
+        max-height: 90vh;
+
+        align-items: stretch;
+    }
+
+    #quick-view-image {
+        width: 100%;
+        max-width: 100%;
+
+        max-height: 300px;
+    }
+
+    .quick-view-details h2 {
+        font-size: 25px;
+
+        padding-right: 40px;
+    }
+
+    .quick-view-price {
+        font-size: 28px;
+    }
+
+}
+

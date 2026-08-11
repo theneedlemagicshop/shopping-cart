@@ -779,20 +779,22 @@ function displayProducts(list = products){
 
     list.forEach(product => {
 
+        const isFavorite = favorites.includes(product.id);
+
         productsDiv.innerHTML += `
         <div class="product">
 
-    <button
-        class="favorite-star ${favorites.includes(product.id) ? "favorited" : ""}"
-        onclick="toggleFavorite(${product.id}, event)"
-        aria-label="Add to favorites">
-        ${favorites.includes(product.id) ? "★" : "☆"}
-    </button>
+            <button
+                class="favorite-star ${isFavorite ? "favorited" : ""}"
+                onclick="toggleFavorite(${product.id}, event)">
+                ${isFavorite ? "★" : "☆"}
+            </button>
 
-    <img
-src="${product.image}"
-class="product-image"
-onclick="openImageModal('${product.image}')">
+            <img
+                src="${product.image}"
+                class="product-image"
+                onclick="openQuickView(${product.id})">
+
             <div class="product-content">
 
                 <h2>${product.name}</h2>
@@ -805,17 +807,17 @@ onclick="openImageModal('${product.image}')">
 
             </div>
 
-<button onclick="addToCart(${product.id})">
-    Add to Cart
-</button>
+            <button onclick="addToCart(${product.id})">
+                Add to Cart
+            </button>
 
-<button class="buy-now" onclick="buyNow(${product.id})">
-    Buy Now
-</button>
+            <button class="buy-now" onclick="buyNow(${product.id})">
+                Buy Now
+            </button>
 
-<button class="youtube-btn" onclick="openYouTube(${product.id})">
-    ▶ Video Tutorial
-</button>
+            <button class="youtube-btn" onclick="openYouTube(${product.id})">
+                ▶ Video Tutorial
+            </button>
 
         </div>
         `;
@@ -1576,6 +1578,59 @@ function updateCartDrawer() {
     });
 
     drawerTotal.textContent = sum;
+
+}
+
+function openQuickView(productId) {
+
+    const product = products.find(p => p.id === productId);
+
+    if (!product) return;
+
+    document.getElementById("quick-view-image").src = product.image;
+
+    document.getElementById("quick-view-name").textContent = product.name;
+
+    document.getElementById("quick-view-price").textContent = product.price;
+
+
+    // Add to Cart button
+    document.getElementById("quick-view-cart").onclick = function () {
+
+        addToCart(product.id);
+
+        closeQuickView();
+
+    };
+
+
+    // Buy Now button
+    document.getElementById("quick-view-buy").onclick = function () {
+
+        buyNow(product.id);
+
+        closeQuickView();
+
+    };
+
+
+    // Video button
+    document.getElementById("quick-view-video").onclick = function () {
+
+        closeQuickView();
+
+        openYouTube(product.id);
+
+    };
+
+
+    document.getElementById("quick-view-modal").style.display = "flex";
+
+}
+
+function closeQuickView() {
+
+    document.getElementById("quick-view-modal").style.display = "none";
 
 }
 
