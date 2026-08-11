@@ -1435,7 +1435,9 @@ function toggleFavorite(id, event) {
 
     event.stopPropagation();
 
-    if (favorites.includes(id)) {
+    const wasFavorite = favorites.includes(id);
+
+    if (wasFavorite) {
 
         favorites = favorites.filter(favoriteId => favoriteId !== id);
 
@@ -1448,6 +1450,24 @@ function toggleFavorite(id, event) {
     localStorage.setItem("favorites", JSON.stringify(favorites));
 
     updateProducts();
+
+    // Only sparkle when ADDING to favorites
+    if (!wasFavorite) {
+
+        const newStar = document.querySelector(
+            `.favorite-star[onclick*="toggleFavorite(${id}"]`
+        );
+
+        if (newStar) {
+
+            newStar.classList.add("favorite-sparkle");
+
+            setTimeout(() => {
+                newStar.classList.remove("favorite-sparkle");
+            }, 550);
+
+        }
+    }
 }
 
 
@@ -1638,8 +1658,9 @@ function openQuickView(productId) {
 
 
     document.getElementById("quick-view-buy").onclick = function () {
-        buyNow(productId);
-    };
+    closeQuickView();
+    buyNow(productId);
+};
 
 
     document.getElementById("quick-view-video").onclick = function () {
