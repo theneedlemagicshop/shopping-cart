@@ -785,10 +785,10 @@ function displayProducts(list = products){
         <div class="product">
 
             <button
-                class="favorite-star ${isFavorite ? "favorited" : ""}"
-                onclick="toggleFavorite(${product.id}, event)">
-                ${isFavorite ? "★" : "☆"}
-            </button>
+    class="favorite-star ${isFavorite ? "favorited" : ""}"
+    onclick="toggleFavorite(${product.id}, event)">
+    ${isFavorite ? "★" : "☆"}
+</button>
 
             <img
                 src="${product.image}"
@@ -1439,32 +1439,15 @@ function toggleFavorite(id, event) {
 
         favorites = favorites.filter(favoriteId => favoriteId !== id);
 
-        localStorage.setItem("favorites", JSON.stringify(favorites));
-
-        updateProducts();
-
     } else {
 
         favorites.push(id);
 
-        localStorage.setItem("favorites", JSON.stringify(favorites));
-
-        updateProducts();
-
-        const newStar = document.querySelector(
-            `.favorite-star[onclick*="toggleFavorite(${id}"]`
-        );
-
-        if (newStar) {
-
-            newStar.classList.add("favorite-sparkle");
-
-            setTimeout(() => {
-                newStar.classList.remove("favorite-sparkle");
-            }, 500);
-
-        }
     }
+
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+
+    updateProducts();
 }
 
 
@@ -1588,39 +1571,79 @@ function openQuickView(productId) {
     if (!product) return;
 
     document.getElementById("quick-view-image").src = product.image;
-
     document.getElementById("quick-view-name").textContent = product.name;
-
     document.getElementById("quick-view-price").textContent = product.price;
 
+    // QUICK VIEW FAVORITE BUTTON
+    const favoriteButton = document.getElementById("quick-view-favorite");
 
-    // Add to Cart button
-    document.getElementById("quick-view-cart").onclick = function () {
+    function updateQuickViewFavorite() {
 
-        addToCart(product.id);
+        if (favorites.includes(productId)) {
+            favoriteButton.textContent = "★ Remove from Favorites";
+            favoriteButton.classList.add("favorited");
+        } else {
+            favoriteButton.textContent = "☆ Add to Favorites";
+            favoriteButton.classList.remove("favorited");
+        }
 
-        closeQuickView();
+    }
 
+    updateQuickViewFavorite();
+
+    favoriteButton.onclick = function () {
+
+        if (favorites.includes(productId)) {
+
+            favorites = favorites.filter(id => id !== productId);
+
+        } else {
+
+            favorites.push(productId);
+
+        }
+
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+
+        updateQuickViewFavorite();
+        updateProducts();
     };
 
 
-    // Buy Now button
+    // CART BUTTON
+    const cartButton = document.getElementById("quick-view-cart");
+
+    const existing = cart.find(item => item.id === productId);
+
+    if (existing) {
+
+        cartButton.innerHTML = `
+            <span class="quick-quantity">
+                <button type="button" onclick="quickViewDecrease(${productId}, event)">−</button>
+                <span>${existing.quantity}</span>
+                <button type="button" onclick="quickViewIncrease(${productId}, event)">+</button>
+            </span>
+        `;
+
+    } else {
+
+        cartButton.innerHTML = `🛒 Add to Cart`;
+
+        cartButton.onclick = function () {
+            addToCart(productId);
+            updateQuickViewCartButton(productId);
+        };
+
+    }
+
+
     document.getElementById("quick-view-buy").onclick = function () {
-
-        buyNow(product.id);
-
-        closeQuickView();
-
+        buyNow(productId);
     };
 
 
-    // Video button
     document.getElementById("quick-view-video").onclick = function () {
-
-        closeQuickView();
-
-        openYouTube(product.id);
-
+        openYouTube(productId);
     };
 
 
@@ -1634,3 +1657,48 @@ function closeQuickView() {
 
 }
 
+function updateQuickViewCartButton(productId) {
+
+    const cartButton = document.getElementById("quick-view-cart");
+    const existing = cart.find(item => item.id === productId);
+
+    if (!existing) {
+
+        cartButton.innerHTML = "🛒 Add to Cart";
+
+        cartButton.onclick = function () {
+            addToCart(productId);
+            updateQuickViewCartButton(productId);
+        };
+
+        return;
+    }
+
+    cartButton.innerHTML = `
+        <span class="quick-quantity">
+            <button type="button" onclick="quickViewDecrease(${productId}, event)">−</button>
+            <span>${existing.quantity}</span>
+            <button type="button" onclick="quickViewIncrease(${productId}, event)">+</button>
+        </span>
+    `;
+}
+
+
+function quickViewIncrease(id, event) {
+
+    event.stopPropagation();
+
+    increase(id);
+
+    updateQuickViewCartButton(id);
+}
+
+
+function quickViewDecrease(id, event) {
+
+    event.stopPropagation();
+
+    decrease(id);
+
+    updateQuickViewCartButton(id);
+}
