@@ -493,7 +493,7 @@ const products = [
     name: "Crochet Flower Scrunchie",
     categories: ["Hair Accessories", "Flower"],
     price: 0,
-    image: "images/image62.png"
+    image: "images/image62.PNG"
 },
 
 ];
@@ -755,6 +755,10 @@ const productVideos = {
 
     60: [
         "https://www.youtube.com/watch?v=Cq0HRtUIZtg"
+    ],
+
+    62: [
+        "https://youtu.be/6JLu79xJd-4?si=IhAaN3fmW8IwRIQH"
     ],
 
 };
