@@ -488,6 +488,14 @@ const products = [
     image: "images/image60.png"
 },
 
+{
+    id: 62,
+    name: "Crochet Flower Scrunchie",
+    categories: ["Hair Accessories", "Flower"],
+    price: 0,
+    image: "images/image62.png"
+},
+
 ];
 
 const productVideos = {
