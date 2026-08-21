@@ -492,7 +492,7 @@ const products = [
     id: 62,
     name: "Crochet Flower Scrunchie",
     categories: ["Hair Accessories", "Flower"],
-    price: 0,
+    price: 249,
     image: "images/image62.PNG"
 },
 
