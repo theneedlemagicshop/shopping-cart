@@ -1,4 +1,12 @@
 const products = [
+    
+{
+    id: 63,
+    name: "Crochet Book Keychain",
+    categories: ["keychain"],
+    price: 499,
+    image: "images/image63.png"
+},
 
 {
     id: 61,
@@ -499,6 +507,10 @@ const products = [
 ];
 
 const productVideos = {
+    
+    63: [
+        "https://youtu.be/ZbCJ1MEXg30?si=QaOxAKa8w5AHftO9"
+    ],
 
     61: [
         "https://www.youtube.com/watch?v=NipxwdXf2UE"
