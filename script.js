@@ -3,7 +3,7 @@ const products = [
 {
     id: 63,
     name: "Crochet Book Keychain",
-    categories: ["keychain"],
+    categories: ["Keychain"],
     price: 199,
     image: "images/image63.PNG"
 },
