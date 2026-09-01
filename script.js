@@ -1,5 +1,13 @@
 const products = [
-    
+
+{
+    id: 64,
+    name: "Crochet Bookmark",
+    categories: ["Other"],
+    price: 249,
+    image: "images/image64.PNG"
+},
+
 {
     id: 63,
     name: "Crochet Book Keychain",
@@ -507,6 +515,10 @@ const products = [
 ];
 
 const productVideos = {
+    
+    64: [
+        "https://youtu.be/Vzka-_KF_vY?si=QtsH2mA1AvwiPk2R"
+    ],
     
     63: [
         "https://youtu.be/ZbCJ1MEXg30?si=QaOxAKa8w5AHftO9"
