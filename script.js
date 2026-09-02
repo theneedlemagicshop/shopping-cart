@@ -1,4 +1,12 @@
 const products = [
+{
+    id: 65,
+    name: "Crochet M&M's Coasters <br> (Set of 6)",
+    categories: ["Other"],
+    price: 299,
+    image: "images/image65.PNG"
+},
+
 
 {
     id: 64,
@@ -34,7 +42,7 @@ const products = [
 
 {
     id: 51,
-    name: "Crochet Earrings (Set of 2)",
+    name: "Crochet Earrings <br> (Set of 2)",
     categories: ["Accessories"],
     price: 299,
     image: "images/image51.png"
