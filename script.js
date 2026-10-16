@@ -1,26 +1,106 @@
 const products = [
+
+{
+    id: 75,
+    name: "Crochet Sunflower Granny Square Tote Bag",
+    categories: ["Bags", "Flowers"],
+    price: 499 , // Cost price: ₹200
+    image: "images/image75.PNG"
+},
+
+{
+    id: 74,
+    name: "Crochet Blooming Flower Coaster",
+    categories: ["Home Decor", "Flowers"],
+    price: 319 , // Cost price: ₹100
+    image: "images/image74.PNG"
+},
+
+{
+    id: 73,
+    name: "Crochet Tulip Flower Paper Clip <br> (Set of 6)",
+    categories: ["Flowers", "Bookmarks"],
+    price: 219 , // Cost price: ₹5 x 6 = ₹30
+    image: "images/image73.PNG"
+},
+
+{
+    id: 72,
+    name: "Crochet Mango Keychain",
+    categories: ["Keychains"],
+    price: 199 , // Cost price: ₹30
+    image: "images/image72.PNG"
+},
+
+{
+    id: 71,
+    name: "Crochet Clock Coasters <br> (Set of 4)",
+    categories: ["Home Decor"],
+    price: 299 , // Cost price: ₹20 x 4 = ₹80
+    image: "images/image71.PNG"
+},
+
+{
+    id: 70,
+    name: "Crochet Tulip Flower Gajra Veni",
+    categories: ["Hair Accessories", "Flowers"],
+    price: 219, // Cost price: ₹20
+    image: "images/image70.PNG"
+},
+
+{
+    id: 69,
+    name: "Crochet Pyramid Pouch",
+    categories: ["Bags"],
+    price: 299, // Cost price: ₹60
+    image: "images/image69.PNG"
+},
+
+{
+    id: 68,
+    name: "Crochet Strawberry Keychain",
+    categories: ["Keychains"],
+    price: 199, // Cost price: ₹20
+    image: "images/image68.PNG"
+},
+
+{
+    id: 67,
+    name: "Crochet Ganesh Ji",
+    categories: ["Amigurumi"],
+    price: 699, // Cost price: ₹200
+    image: "images/image67.PNG"
+},
+
 {
     id: 65,
     name: "Crochet M&M's Coasters <br> (Set of 6)",
-    categories: ["Other"],
-    price: 299,
+    categories: ["Home Decor"],
+    price: 299, // Cost price: ₹10 x 6 = ₹60
     image: "images/image65.PNG"
 },
 
+{
+    id: 66,
+    name: "Crochet Bal Gopal ji",
+    categories: ["Amigurumi"],
+    price: 699, // Cost price: ₹200
+    image: "images/image66.PNG"
+},
 
 {
     id: 64,
     name: "Crochet Bookmark",
-    categories: ["Other"],
-    price: 249,
+    categories: ["Bookmarks"],
+    price: 249, // Cost price: ₹10
     image: "images/image64.PNG"
 },
 
 {
     id: 63,
     name: "Crochet Book Keychain",
-    categories: ["Keychain"],
-    price: 199,
+    categories: ["Keychains"],
+    price: 199, // Cost price: ₹10
     image: "images/image63.PNG"
 },
 
@@ -28,71 +108,71 @@ const products = [
     id: 61,
     name: "Crochet Bandana",
     categories: ["Hair Accessories"],
-    price: 499,
+    price: 499, // Cost price: ₹150
     image: "images/image61.png"
 },
 
 {
     id: 52,
     name: "Crochet Pineapple Bag",
-    categories: ["Bag"],
-    price: 399,
+    categories: ["Bags"],
+    price: 399, // Cost price: ₹100
     image: "images/image52.png"
 },
 
 {
     id: 51,
-    name: "Crochet Earrings <br> (Set of 2)",
+    name: "Crochet Earrings <br> (Set of 2 Pairs)",
     categories: ["Accessories"],
-    price: 299,
+    price: 299, // Cost price: ₹20 x 2 = ₹40
     image: "images/image51.png"
 },
 
 {
     id: 16,
     name: "Crochet Lily Flower",
-    categories: ["Flower", "Home Decor"],
-    price: 349,
+    categories: ["Flowers", "Home Decor"],
+    price: 259, // Cost price: ₹40
     image: "images/image16.png"
 },
 
 {
     id: 1,
     name: "Crochet Shell Bag"  ,
-    categories: ["Bag"],
-    price: 699,
+    categories: ["Bags"],
+    price: 699, // Cost price: ₹100
     image: "images/image1.png"
 },
 
 {
     id: 2,
     name: "Crochet Football Keychain",
-    categories: ["Keychain"],
-    price: 349,
+    categories: ["Keychains"],
+    price: 349, // Cost price: ₹50
     image: "images/image2.png"
 },
 
 {
     id: 3,
     name: "Crochet Heart Keychain for DAD",
-    categories: ["Keychain"],
-    price: 299,
+    categories: ["Keychains"],
+    price: 299, // Cost price: ₹50
     image: "images/image3.png"
 },
 
 {
     id: 4,
     name: "Crochet Tulip Tote Bag",
-    categories: ["Bag", "Flower"],
-    price: 799,
+    categories: ["Bags", "Flowers"],
+    price: 799, // Cost price: ₹200
     image: "images/image4.png"
 },
 
 {
     id: 5,
     name: "Set of 3 Crochet Flower Bun Ties",
-    categories: ["Flower", "Hair Accessories"],
-    price: 499,
+    categories: ["Flowers", "Hair Accessories"],
+    price: 499, // Cost price: ₹20 x 3 = ₹60 Stick Cost = ₹20 Total Cost = ₹80
     image: "images/image5.png"
 },
 
@@ -100,31 +180,31 @@ const products = [
     id: 6,
     name: "Crochet Triangle Shawl",
     categories: ["Clothing", "Accessories"],
-    price: 1799,
+    price: 1799, // Cost price: ₹600
     image: "images/image6.png"
 },
 
 {
     id: 7,
     name: "Crochet Rose Sling Bag",
-    categories: ["Bag", "Flower"],
-    price: 499,
+    categories: ["Bags", "Flowers"],
+    price: 499, // Cost price: ₹70
     image: "images/image7.png"
 },
 
 {
     id: 8,
     name: "Crochet Heart Keychain for MOM",
-    categories: ["Keychain"],
-    price: 299,
+    categories: ["Keychains"],
+    price: 299, // Cost price: ₹50
     image: "images/image8.png"
 },
 
 {
     id: 9,
     name: "Crochet Flower Bracelet",
-    categories: ["Flower", "Accessories"],
-    price: 299,
+    categories: ["Flowers", "Accessories"],
+    price: 249, // Cost price: ₹20
     image: "images/image9.png"
 },
 
@@ -132,7 +212,7 @@ const products = [
     id: 10,
     name: "Set of 6 Crochet Kashmiri Bangles <br> (Size 2.4)",
     categories: ["Accessories"],
-    price: 499,
+    price: 499, // Cost price: ₹20 x 6 = ₹120
     image: "images/image10.png"
 },
 
@@ -140,23 +220,23 @@ const products = [
     id: 11,
     name: "Crochet Laptop/Book Cover",
     categories: ["Other"],
-    price: 499,
+    price: 499, // Cost price: ₹100
     image: "images/image11.png"
 },
 
 {
     id: 12,
     name: "Crochet Morpankh Keychain",
-    categories: ["Keychain"],
-    price: 399,
+    categories: ["Keychains"],
+    price: 399, // Cost price: ₹50
     image: "images/image12.png"
 },
 
 {
     id: 13,
     name: "Set of 3 Crochet Yarn Keychain",
-    categories: ["Keychain"],
-    price: 399,
+    categories: ["Keychains"],
+    price: 399, // Cost price: ₹10 x 3 = ₹30
     image: "images/image13.png"
 },
 
@@ -164,23 +244,23 @@ const products = [
     id: 14,
     name: " Pair of Crochet Earrings",
     categories: ["Accessories"],
-    price: 399,
+    price: 399, // Cost price: ₹40
     image: "images/image14.png"
 },
 
 {
     id: 15,
     name: "Crochet Rainbow Keychain",
-    categories: ["Keychain"],
-    price: 329,
+    categories: ["Keychains"],
+    price: 329, // Cost price: ₹50
     image: "images/image15.png"
 },
 
 {
     id: 17,
     name: "Crochet Keychain for Cricket Lovers",
-    categories: ["Keychain"],
-    price: 399,
+    categories: ["Keychains"],
+    price: 399, // Cost price: ₹50
     image: "images/image17.png"
 },
 
@@ -188,15 +268,15 @@ const products = [
     id: 18,
     name: "Crochet Toran Patti Jai Mata Di",
     categories: ["Home Decor"],
-    price: 999,
+    price: 999, // Cost price: ₹200
     image: "images/image18.png"
 },
 
 {
     id: 19,
     name: "Crochet Sunflower Scrunchie",
-    categories: ["Flower", "Hair Accessories"],
-    price: 249,
+    categories: ["Flowers", "Hair Accessories"],
+    price: 249, // Cost price: ₹40
     image: "images/image19.png"
 },
 
@@ -204,39 +284,39 @@ const products = [
     id: 20,
     name: "Crochet Shivling",
     categories: ["Home Decor"],
-    price: 499,
+    price: 499, // Cost price: ₹100
     image: "images/image20.png"
 },
 
 {
     id: 21,
     name: "Crochet Pokemon Ultra Ball Keychain",
-    categories: ["Keychain"],
-    price: 399,
+    categories: ["Keychains"],
+    price: 399, // Cost price: ₹150
     image: "images/image21.png"
 },
 
 {
     id: 22,
     name: "Crochet Pokemon Master Ball Keychain",
-    categories: ["Keychain"],
-    price: 399,
+    categories: ["Keychains"],
+    price: 399, // Cost price: ₹150
     image: "images/image22.png"
 },
 
 {
     id: 23,
     name: "Crochet Pokemon Great Ball Keychain ",
-    categories: ["Keychain"],
-    price: 399,
+    categories: ["Keychains"],
+    price: 399, // Cost price: ₹150
     image: "images/image23.png"
 },
 
 {
     id: 24,
     name: "Crochet Pokeball Keychain",
-    categories: ["Keychain"],
-    price: 399,
+    categories: ["Keychains"],
+    price: 399, // Cost price: ₹150
     image: "images/image24.png"
 },
 
@@ -244,7 +324,7 @@ const products = [
     id: 25,
     name: "Crochet Cap ",
     categories: ["Clothing"],
-    price: 299,
+    price: 299, // Cost price: ₹60
     image: "images/image25.png"
 },
 
@@ -252,23 +332,23 @@ const products = [
     id: 26,
     name: "Crochet Candies <br> (Set of 4) ",
     categories: ["Home Decor"],
-    price: 249,
+    price: 249, // Cost price: ₹10 x 4 = ₹40
     image: "images/image26.png"
 },
 
 {
     id: 27,
     name: "Crochet Flower Headband ",
-    categories: ["Flower", "Hair Accessories"],
-    price: 199,
+    categories: ["Flowers", "Hair Accessories"],
+    price: 199, // Cost price: ₹30
     image: "images/image27.png"
 },
 
 {
     id: 28,
     name: "Crochet Puff Stitch Flower",
-    categories: ["Flower"],
-    price: 199,
+    categories: ["Flowers"],
+    price: 199, // Cost price: ₹10
     image: "images/image28.png"
 },
 
@@ -276,7 +356,7 @@ const products = [
     id: 29,
     name: "Crochet Baby Dress",
     categories: ["Clothing"],
-    price: 1299,
+    price: 1299, // Cost price: ₹300
     image: "images/image29.png"
 },
 
@@ -284,7 +364,7 @@ const products = [
     id: 30,
     name: "Crochet Bandana (Head Wrap) ",
     categories: [ "Hair Accessories"],
-    price: 349,
+    price: 349, // Cost price: ₹100
     image: "images/image30.png"
 },
 
@@ -292,7 +372,7 @@ const products = [
     id: 31,
     name: "Crochet Frappe Cup ",
     categories: ["Home Decor"],
-    price: 299,
+    price: 299, // Cost price: ₹40
     image: "images/image31.png"
 },
 
@@ -300,7 +380,7 @@ const products = [
     id: 32,
     name: "Crochet Coffee Mug Scarf",
     categories: ["Accessories", "Home Decor"],
-    price: 449,
+    price: 449, // Cost price: ₹150
     image: "images/image32.png"
 },
 
@@ -308,7 +388,7 @@ const products = [
     id: 33,
     name: "Crochet Ruffle Cuffs (Pair)",
     categories: ["Accessories"],
-    price: 349,
+    price: 349, // Cost price: ₹100
     image: "images/image33.png"
 },
 
@@ -316,7 +396,7 @@ const products = [
     id: 34,
     name: "Crochet Hair Scrunchie",
     categories: ["Hair Accessories"],
-    price: 199,
+    price: 199, // Cost price: ₹50
     image: "images/image34.png"
 },
 
@@ -324,7 +404,7 @@ const products = [
     id: 35,
     name: "Crochet Evileye Table Mat",
     categories: ["Home Decor"],
-    price: 499,
+    price: 499, // Cost price: ₹250
     image: "images/image35.png"
 },
 
@@ -332,23 +412,23 @@ const products = [
     id: 36,
     name: "Crochet Mini Santa Cap",
     categories: ["Home Decor"],
-    price: 199,
+    price: 199, // Cost price: ₹10
     image: "images/image36.png"
 },
 
 {
     id: 37,
-    name: "Crochet Santa Jar Cover",
+    name: "Crochet Santa Jar Cover <br> (Jar Included)",
     categories: ["Home Decor"],
-    price: 499,
+    price: 499, // Cost price: ₹100 Jar Cost: ₹100 Total Cost: ₹200
     image: "images/image37.png"
 },
 
 {
     id: 38,
     name: "Crochet Rose Bag",
-    categories: ["Bag", "Flower"],
-    price: 999,
+    categories: ["Bags", "Flowers"],
+    price: 999, // Cost price: ₹300
     image: "images/image38.png"
 },
 
@@ -356,7 +436,7 @@ const products = [
     id: 39,
     name: "Crochet Santa Applique",
     categories: ["Home Decor"],
-    price: 199,
+    price: 199, // Cost price: ₹10
     image: "images/image39.png"
 },
 
@@ -364,7 +444,7 @@ const products = [
     id: 40,
     name: "Crochet Flower Pot Fridge Magnet",
     categories: ["Home Decor"],
-    price: 249,
+    price: 249, // Cost price: ₹40
     image: "images/image40.png"
 },
 
@@ -372,7 +452,7 @@ const products = [
     id: 41,
     name: "Crochet Airpod Pocket ",
     categories: ["Other"],
-    price: 299,
+    price: 299, // Cost price: ₹40
     image: "images/image41.png"
 },
 
@@ -380,7 +460,7 @@ const products = [
     id: 42,
     name: "Crochet iPhone Pocket",
     categories: ["Other"],
-    price: 449,
+    price: 449, // Cost price: ₹80
     image: "images/image42.png"
 },
 
@@ -388,7 +468,7 @@ const products = [
     id: 43,
     name: "Crochet Heart Button Cover <br> (Set of 6)",
     categories: ["Accessories"],
-    price: 199,
+    price: 199, // Cost price: ₹5 x 6 = ₹30
     image: "images/image43.png"
 },
 
@@ -396,7 +476,7 @@ const products = [
     id: 44,
     name: "Crochet Butterfly Button Cover <br> (Set of 6)",
     categories: ["Accessories"],
-    price: 199,
+    price: 199, // Cost price: ₹5 x 6 = ₹30
     image: "images/image44.png"
 },
 
@@ -404,23 +484,23 @@ const products = [
     id: 45,
     name: "Crochet Bow Button Cover <br> (Set of 6)",
     categories: ["Accessories"],
-    price: 199,
+    price: 199, // Cost price: ₹5 x 6 = ₹30
     image: "images/image45.png"
 },
 
 {
     id: 46,
     name: "Crochet Gajra",
-    categories: ["Hair Accessories", "Flower"],
-    price: 299,
+    categories: ["Hair Accessories", "Flowers"],
+    price: 299, // Cost price: ₹60
     image: "images/image46.png"
 },
 
 {
     id: 47,
     name: "Crochet Flower Pouch",
-    categories: ["Bag", "Flower"],
-    price: 299,
+    categories: ["Bags", "Flowers"],
+    price: 299, // Cost price: ₹40
     image: "images/image47.png"
 },
 
@@ -428,15 +508,15 @@ const products = [
     id: 48,
     name: "Crochet Safety Pin Brooch (PRADA)",
     categories: ["Accessories"],
-    price: 199,
+    price: 199, // Cost price: ₹20
     image: "images/image48.png"
 },
 
 {
     id: 49,
     name: "Crochet Sunflower Lipbalm Cover",
-    categories: ["Accessories", "Flower"],
-    price: 299,
+    categories: ["Accessories", "Flowers"],
+    price: 299, // Cost price: ₹50
     image: "images/image49.png"
 },
 
@@ -444,7 +524,7 @@ const products = [
     id: 50,
     name: "Crochet Hair Scrunchie",
     categories: ["Hair Accessories"],
-    price: 199,
+    price: 199, // Cost price: ₹50
     image: "images/image50.png"
 },
 
@@ -452,15 +532,15 @@ const products = [
     id: 53,
     name: "Crochet Flower Button Cover <br> (Set of 6)",
     categories: ["Accessories"],
-    price: 199,
+    price: 199, // Cost price: ₹5 x 6 = ₹30
     image: "images/image53.png"
 },
 
 {
     id: 54,
     name: "Crochet Rose Hairpin",
-    categories: ["Hair Accessories","Flower"],
-    price: 199,
+    categories: ["Hair Accessories","Flowers"],
+    price: 199, // Cost price: ₹30
     image: "images/image54.png"
 },
 
@@ -468,23 +548,23 @@ const products = [
     id: 55,
     name: "Crochet Evil Eye Charm",
     categories: ["Home Decor"],
-    price: 349,
+    price: 349, // Cost price: ₹50
     image: "images/image55.png"
 },
 
 {
     id: 56,
     name: "Crochet Rose Gajra",
-    categories: ["Hair Accessories", "Flower"],
-    price: 299,
+    categories: ["Hair Accessories", "Flowers"],
+    price: 299, // Cost price: ₹100
     image: "images/image56.png"
 },
 
 {
     id: 57,
     name: "Crochet Bookmark",
-    categories: ["Other"],
-    price: 199,
+    categories: ["Bookmarks"],
+    price: 199, // Cost price: ₹20
     image: "images/image57.png"
 },
 
@@ -492,15 +572,15 @@ const products = [
     id: 58,
     name: "Crochet Specs Cover",
     categories: ["Accessories"],
-    price: 249,
+    price: 249, // Cost price: ₹40
     image: "images/image58.png"
 },
 
 {
     id: 59,
     name: "Crochet Flower",
-    categories: ["Flower"],
-    price: 199,
+    categories: ["Flowers"],
+    price: 199, // Cost price: ₹20
     image: "images/image59.png"
 },
 
@@ -508,15 +588,15 @@ const products = [
     id: 60,
     name: "Crochet Bun Cover",
     categories: ["Hair Accessories"],
-    price: 249,
+    price: 249, // Cost price: ₹40
     image: "images/image60.png"
 },
 
 {
     id: 62,
     name: "Crochet Flower Scrunchie",
-    categories: ["Hair Accessories", "Flower"],
-    price: 249,
+    categories: ["Hair Accessories", "Flowers"],
+    price: 249, // Cost price: ₹50
     image: "images/image62.PNG"
 },
 
@@ -524,6 +604,50 @@ const products = [
 
 const productVideos = {
     
+    75: [
+        "https://www.youtube.com/watch?v=RsNKQ2SfT6A"
+    ],
+
+    74: [
+        "https://www.youtube.com/watch?v=i57JxUHJF88"
+    ],
+
+    73: [
+        "https://www.youtube.com/watch?v=pMa42hpWaAI"
+    ],
+
+    72: [
+        "https://www.youtube.com/watch?v=WfKeqMoyL2o"
+    ],
+
+    71: [
+        "https://www.youtube.com/watch?v=zUauAqu1t0g"
+    ],
+
+    70: [
+        "https://www.youtube.com/watch?v=jNYFhM28CFc"
+    ],
+
+    69: [
+        "https://www.youtube.com/watch?v=z0P0vzetLwQ"
+    ],
+
+    68: [
+        "https://www.youtube.com/watch?v=b-OVbeuR3gs"
+    ],
+
+    67: [
+        "https://www.youtube.com/watch?v=lbk0kG7gLcI"
+    ],
+
+    65: [
+        "https://www.youtube.com/watch?v=SRbjMM5r6fY"
+    ],
+
+    66: [
+        "https://www.youtube.com/watch?v=NBfPDCzgAj0"
+    ],
+
     64: [
         "https://youtu.be/Vzka-_KF_vY?si=QtsH2mA1AvwiPk2R"
     ],
