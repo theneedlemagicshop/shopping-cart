@@ -1,6 +1,22 @@
 const products = [
 
 {
+    id: 77,
+    name: "Crochet Diya (Set of 6)",
+    categories: ["Home Decor"],
+    price: 449 , // Cost price: ₹35 x 6 = ₹210 (360)
+    image: "images/image77.PNG"
+},
+
+{
+    id: 76,
+    name: "Crochet Diya (Set of 12)",
+    categories: ["Home Decor"],
+    price: 699 , // Cost price: ₹35 x 12 = ₹420 (570)
+    image: "images/image76.PNG"
+},
+
+{
     id: 75,
     name: "Crochet Sunflower Granny Square Tote Bag",
     categories: ["Bags", "Flowers"],
@@ -604,6 +620,16 @@ const products = [
 
 const productVideos = {
     
+
+    77: [
+        "https://www.youtube.com/watch?v=nNJU08ch4GQ"
+    ],
+
+    76: [
+        "https://www.youtube.com/watch?v=nNJU08ch4GQ"
+    ],
+
+
     75: [
         "https://www.youtube.com/watch?v=RsNKQ2SfT6A"
     ],
