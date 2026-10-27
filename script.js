@@ -1004,7 +1004,11 @@ function displayProducts(list = products){
 
             <div class="product-content">
 
-                <h2>${product.name}</h2>
+                
+<h2>${product.name
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/\([^)]*\)/g, part => part.replace(/ /g, "\u00A0"))}</h2>
+
 
                 <h3>₹${product.price}</h3>
 
@@ -1798,7 +1802,12 @@ function openQuickView(productId) {
     if (!product) return;
 
     document.getElementById("quick-view-image").src = product.image;
-    document.getElementById("quick-view-name").textContent = product.name;
+    
+document.getElementById("quick-view-name").textContent =
+    product.name
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/\([^)]*\)/g, part => part.replace(/ /g, "\u00A0"));
+
     document.getElementById("quick-view-price").textContent = product.price;
 
     // QUICK VIEW FAVORITE BUTTON
@@ -1930,3 +1939,304 @@ function quickViewDecrease(id, event) {
 
     updateQuickViewCartButton(id);
 }
+
+
+/* STEP 2: CHECKOUT FIXES */
+
+// Prevent checkout when cart is empty
+function checkout() {
+    if (cart.length === 0) {
+        alert("Your cart is empty! Add a product first.");
+        return;
+    }
+
+    closeCartDrawer();
+
+    document.getElementById("checkout-modal").style.display = "block";
+}
+
+// Buy Now: Add product and open checkout
+function buyNow(id) {
+    addToCart(id);
+    checkout();
+}
+
+// Cancel checkout safely
+function cancelCheckout() {
+    document.getElementById("checkout-modal").style.display = "none";
+
+    document.querySelectorAll("#products button, #cart button")
+        .forEach(button => {
+            button.disabled = false;
+        });
+
+    updateCart();
+}
+
+
+/* STEP 3: QUICK VIEW CART FIX */
+
+let activeQuickViewProductId = null;
+
+// Save the product currently being viewed
+const originalOpenQuickView = openQuickView;
+
+openQuickView = function(productId) {
+    activeQuickViewProductId = productId;
+    originalOpenQuickView(productId);
+
+    // Replace the old nested-button controls
+    updateQuickViewCartButton(productId);
+};
+
+// Add the currently viewed product
+function quickViewAddToCart() {
+    if (activeQuickViewProductId === null) return;
+
+    addToCart(activeQuickViewProductId);
+    updateQuickViewCartButton(activeQuickViewProductId);
+}
+
+// Display valid quantity controls
+updateQuickViewCartButton = function(productId) {
+    const container = document.getElementById("quick-view-cart");
+    const item = cart.find(p => p.id === productId);
+
+    if (!item) {
+        container.innerHTML = `
+            <button type="button"
+                onclick="quickViewAddToCart()">
+                🛒 Add to Cart
+            </button>
+        `;
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="quick-quantity">
+            <button type="button"
+                onclick="quickViewDecrease(${productId}, event)">
+                −
+            </button>
+
+            <span>${item.quantity}</span>
+
+            <button type="button"
+                onclick="quickViewIncrease(${productId}, event)">
+                +
+            </button>
+        </div>
+    `;
+};
+
+
+/* FIX: QUICK VIEW ADDING TWICE */
+
+const previousQuickViewCartUpdate = updateQuickViewCartButton;
+
+updateQuickViewCartButton = function(productId) {
+    previousQuickViewCartUpdate(productId);
+
+    const container = document.getElementById("quick-view-cart");
+
+    // Remove old click handlers from the container
+    container.onclick = null;
+};
+
+
+/* OPEN PRODUCT POPUP BY CLICKING CARD */
+
+document.getElementById("products").addEventListener("click", function(event) {
+    // Let favorite stars and other interactive controls work normally
+    if (event.target.closest("button, a, input, select")) {
+        return;
+    }
+
+    const card = event.target.closest(".product");
+    if (!card) return;
+
+    // Avoid opening twice if the image already has its own click handler
+    if (event.target.closest(".product-image")) return;
+
+    const image = card.querySelector(".product-image");
+    if (image) {
+        image.click();
+    }
+});
+
+
+/* MOBILE BACK TO TOP */
+
+(function () {
+    const backToTop = document.getElementById("back-to-top");
+
+    if (!backToTop) return;
+
+
+function updateBackToTop() {
+    if (window.scrollY > 450) {
+        backToTop.classList.add("visible");
+    } else {
+        backToTop.classList.remove("visible");
+    }
+}
+
+})();
+
+
+/* UPGRADE 3: STICKY NAVIGATION */
+
+(function () {
+    const nav = document.getElementById("tnm-sticky-nav");
+    if (!nav) return;
+
+    function updateStickyNav() {
+        nav.classList.toggle(
+            "is-visible",
+            window.scrollY > 280
+        );
+    }
+
+    window.addEventListener("scroll", updateStickyNav, {
+        passive: true
+    });
+
+    updateStickyNav();
+
+    // Search shortcut
+    document.getElementById("tnm-nav-search")
+        ?.addEventListener("click", function () {
+            const search = document.getElementById("search");
+
+            if (search) {
+                search.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+
+                search.focus({ preventScroll: true });
+            }
+        });
+
+    // Use the existing favorites button
+    document.getElementById("tnm-nav-favorites")
+        ?.addEventListener("click", function () {
+            document.getElementById("favorites-btn")?.click();
+        });
+})();
+
+
+/* UPGRADE 6: EMPTY STATES AND IMAGE LOADING */
+
+(function () {
+    const grid = document.getElementById("products");
+
+    if (!grid) return;
+
+    function enhanceProducts() {
+        const cards = grid.querySelectorAll(".product");
+        const emptyMessage =
+            grid.querySelector(":scope > .tnm-empty-results");
+
+        // Add a professional no-results message
+        if (cards.length === 0) {
+            if (!emptyMessage) {
+                const message = document.createElement("div");
+
+                message.className = "tnm-empty-results";
+
+                message.innerHTML = `
+                    <div class="tnm-empty-icon">⌕</div>
+                    <h3>No products found</h3>
+                    <p>
+                        Try another search or change
+                        your filters to discover more
+                        handmade creations.
+                    </p>
+                `;
+
+                grid.appendChild(message);
+            }
+        } else if (emptyMessage) {
+            emptyMessage.remove();
+        }
+
+        // Add a subtle image loading effect
+        grid.querySelectorAll(".product-image")
+            .forEach(function (img) {
+
+                if (img.dataset.tnmEnhanced) return;
+
+                img.dataset.tnmEnhanced = "true";
+
+                if (!img.complete) {
+                    img.classList.add("tnm-loading-image");
+
+                    function finishLoading() {
+                        img.classList.remove(
+                            "tnm-loading-image"
+                        );
+                    }
+
+                    img.addEventListener(
+                        "load",
+                        finishLoading,
+                        { once: true }
+                    );
+
+                    img.addEventListener(
+                        "error",
+                        finishLoading,
+                        { once: true }
+                    );
+                }
+            });
+    }
+
+    // Also supports search and filter updates
+    const observer = new MutationObserver(enhanceProducts);
+
+    observer.observe(grid, {
+        childList: true,
+        subtree: true
+    });
+
+    enhanceProducts();
+})();
+
+
+/* PREMIUM SMOOTH BACK TO TOP ANIMATION */
+
+function smoothScrollToTop() {
+    const startPosition = window.scrollY;
+    const duration = 850;
+    const startTime = performance.now();
+
+    // Prevent other CSS scroll effects interfering
+    const html = document.documentElement;
+    const previousBehavior = html.style.scrollBehavior;
+    html.style.scrollBehavior = "auto";
+
+    function animate(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Smooth easing: starts fast, slows near the top
+        const ease = 1 - Math.pow(1 - progress, 3);
+
+        window.scrollTo(
+            0,
+            startPosition * (1 - ease)
+        );
+
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            window.scrollTo(0, 0);
+            html.style.scrollBehavior = previousBehavior;
+        }
+    }
+
+    requestAnimationFrame(animate);
+}
+

@@ -34,7 +34,85 @@
 
 </div>
 
+
+<!-- PREMIUM WEBSITE FOOTER -->
+<footer class="tnm-footer">
+
+    <div class="tnm-footer-inner">
+
+        <div class="tnm-footer-brand">
+            <h2>The Needle Magic Shop</h2>
+            <p>
+                Beautifully handcrafted crochet creations,
+                made with love and attention to detail.
+            </p>
+        </div>
+
+        <div class="tnm-footer-links">
+            <h3>Explore</h3>
+            <a href="#products">Shop Collection</a>
+            <a href="#search">Search Products</a>
+        </div>
+
+        <div class="tnm-footer-contact">
+            <h3>Need Help?</h3>
+            <p>
+                Have a question about a product,
+                shipping, or an order?
+            </p>
+
+            <a href="https://wa.me/918588827327"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="tnm-contact-link">
+                Chat on WhatsApp ↗
+            </a>
+        </div>
+
+    </div>
+
+    <div class="tnm-footer-bottom">
+        <span>© The Needle Magic Shop</span>
+        <span>Handmade with ♥</span>
+    </div>
+
+</footer>
+
+
 <body>
+
+    
+<!-- PREMIUM STICKY NAVIGATION -->
+<nav id="tnm-sticky-nav"
+     aria-label="Quick shop navigation">
+
+    <div class="tnm-sticky-inner">
+
+        <a href="#" class="tnm-nav-brand">
+            The Needle Magic <span>Shop</span>
+        </a>
+
+        <div class="tnm-nav-actions">
+
+            <button type="button"
+                    id="tnm-nav-search"
+                    aria-label="Go to search">
+                <span aria-hidden="true">⌕</span>
+                <span class="tnm-nav-label">Search</span>
+            </button>
+
+            <button type="button"
+                    id="tnm-nav-favorites"
+                    aria-label="Show favorites">
+                <span aria-hidden="true">☆</span>
+                <span class="tnm-nav-label">Favorites</span>
+            </button>
+
+        </div>
+
+    </div>
+</nav>
+
 
 <header class="store-header">
 
@@ -111,6 +189,38 @@
     <div id="category-buttons"></div>
 
 </div>
+
+
+<!-- PREMIUM COLLECTION INTRO -->
+<section class="collection-intro">
+
+    <div class="collection-hero">
+        <span class="collection-kicker">
+            THE NEEDLE MAGIC SHOP · HANDMADE COLLECTION
+        </span>
+
+        <h2>Made with love, styled for you.</h2>
+
+        <p>
+            Discover thoughtfully handcrafted crochet
+            creations for gifting, decorating,
+            and everyday joy.
+        </p>
+
+        <div class="collection-benefits">
+            <span>♡ Handmade</span>
+            <span>✦ Made with Care</span>
+            <span>◉ Easy Ordering</span>
+        </div>
+    </div>
+
+    <div class="collection-heading">
+        <h2>Explore Our Collection</h2>
+        <span>Handcrafted Favorites</span>
+    </div>
+
+</section>
+
 
 <div id="products"></div>
 
@@ -219,9 +329,11 @@
         ⚡ Buy Now
     </button>
 
-    <button id="quick-view-cart">
+<div id="quick-view-cart" class="quick-view-cart-control">
+    <button type="button" onclick="quickViewAddToCart()">
         🛒 Add to Cart
     </button>
+</div>
 
     <button id="quick-view-video" class="youtube-btn">
         ▶ Video Tutorial
@@ -280,5 +392,47 @@
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <script src="script.js"></script>
 
+
+<!-- Mobile Back to Top Button -->
+<button id="back-to-top" type="button"
+    aria-label="Back to top"
+    onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+    ↑
+</button>
+
+
+
+<!-- BACK TO TOP BUTTON -->
+
+<button id="scrollTopBtn"
+        type="button"
+        aria-label="Back to top"
+        onclick="smoothScrollToTop()">
+    ↑
+</button>
+
+
+<script>
+(function () {
+    const btn = document.getElementById("scrollTopBtn");
+
+    function updateScrollButton() {
+        if (window.scrollY > 400) {
+            btn.style.setProperty("display", "flex", "important");
+        } else {
+            btn.style.setProperty("display", "none", "important");
+        }
+    }
+
+    window.addEventListener("scroll", updateScrollButton, {
+        passive: true
+    });
+
+    updateScrollButton();
+})();
+</script>
+
+
 </body>
 </html>
+
