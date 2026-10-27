@@ -1,6 +1,14 @@
 const products = [
 
 {
+    id: 78,
+    name: "Crochet Shubh Labh Hanging",
+    categories: ["Home Decor"],
+    price: 379 , // Cost price: ₹150 (360)
+    image: "images/image78.PNG"
+},
+
+{
     id: 77,
     name: "Crochet Diya (Set of 6)",
     categories: ["Home Decor"],
@@ -620,6 +628,10 @@ const products = [
 
 const productVideos = {
     
+    78: [
+        "https://www.youtube.com/watch?v=HORNhcfB9Mo"
+    ],
+
 
     77: [
         "https://www.youtube.com/watch?v=nNJU08ch4GQ"
