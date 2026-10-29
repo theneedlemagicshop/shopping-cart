@@ -4438,3 +4438,20 @@ input, textarea, select {
     border-color: #2D5365 !important;
 }
 
+/* HIDE FLOATING CART WHILE CHECKOUT IS OPEN */
+
+body:has(#checkout-modal[style*="display: block"]) #floating-cart,
+body:has(#checkout-modal[style*="display: flex"]) #floating-cart {
+    display: none !important;
+    pointer-events: none !important;
+}
+
+/* CANCEL CHECKOUT BUTTON - TOP RIGHT */
+
+#checkout-modal [onclick*="cancelCheckout"] {
+    display: block !important;
+    width: fit-content !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    float: none !important;
+}

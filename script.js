@@ -2266,7 +2266,7 @@ function smoothScrollToTop() {
     }, 0);
     const gift = subtotal >= 299;
     const discount = subtotal >= 499 ? Math.round(subtotal * 10) / 100 : 0;
-    const codFee = method === "cod" && cart.length ? 49 : 0;
+    const codFee = method === "cod" && cart.length ? 29 : 0;
     return { subtotal, gift, discount, codFee,
       total: subtotal - discount + codFee };
   }
@@ -2345,7 +2345,7 @@ function updateTNMCheckout() {
         ${method === "cod" ? `
             <div>
                 <span>Cash on Delivery fee</span>
-                <strong>+${rupees(49)}</strong>
+                <strong>+${rupees(29)}</strong>
             </div>
         ` : ""}
 
