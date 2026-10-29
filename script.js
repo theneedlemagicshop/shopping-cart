@@ -1,6 +1,14 @@
 const products = [
 
 {
+    id: 79,
+    name: "Crochet Lotus Diya Holder",
+    categories: ["Home Decor","Flowers"],
+    price: 249 , // Cost price: ₹60 (220)
+    image: "images/image79.PNG"
+},
+
+{
     id: 78,
     name: "Crochet Shubh Labh Hanging",
     categories: ["Home Decor"],
@@ -11,7 +19,7 @@ const products = [
 {
     id: 77,
     name: "Crochet Diya (Set of 6)",
-    categories: ["Home Decor"],
+    categories: ["Home Decor",],
     price: 449 , // Cost price: ₹35 x 6 = ₹210 (360)
     image: "images/image77.PNG"
 },
@@ -627,6 +635,10 @@ const products = [
 ];
 
 const productVideos = {
+    
+    79: [
+        "https://youtu.be/byA2Le7ErqI?si=G58b-2Fa74xihlot"
+    ],
     
     78: [
         "https://www.youtube.com/watch?v=HORNhcfB9Mo"
