@@ -4424,3 +4424,17 @@ input, textarea, select {
         font-size: 12px;
     }
 }
+
+/* CANCEL CHECKOUT BUTTON - MATCH SHOP THEME */
+
+#checkout-modal [onclick*="cancelCheckout"] {
+    background: #203D4C !important;
+    color: #ffffff !important;
+    border-color: #203D4C !important;
+}
+
+#checkout-modal [onclick*="cancelCheckout"]:hover {
+    background: #2D5365 !important;
+    border-color: #2D5365 !important;
+}
+
