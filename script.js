@@ -2655,7 +2655,7 @@ document.addEventListener("dragstart", function(e) {
     }
 });
 
-const ENABLE_DATABASE_COD = false;
+const ENABLE_DATABASE_COD = true;
 
 
 /* CLOUDFLARE TURNSTILE CHECKOUT FIX */
@@ -2851,5 +2851,253 @@ const ENABLE_DATABASE_COD = false;
         }
     };
 
+})();
+
+
+/* TNM - LIVE COD CHECKOUT (append after the existing test code) */
+(function () {
+    const earlierPlaceOrder = placeOrder;
+    let placingCOD = false;
+
+    const read = id => document.getElementById(id)?.value.trim() || "";
+    const paymentMethod = () => document.querySelector(
+        'input[name="tnm-payment"]:checked'
+    )?.value || "online";
+
+    function updateCODButton() {
+        const button = document.querySelector(
+            '#checkout-modal button[onclick*="placeOrder"]'
+        );
+        if (!button || placingCOD) return;
+        button.textContent = ENABLE_DATABASE_COD && paymentMethod() === "cod"
+            ? "Place COD Order"
+            : "Continue on WhatsApp (Temporary)";
+    }
+
+    async function submitCOD(testMode = false) {
+        if (placingCOD) return;
+
+        if (paymentMethod() !== "cod") {
+            alert("Select Cash on Delivery first.");
+            return;
+        }
+
+        if (!cart.length) {
+            alert("Your cart is empty.");
+            return;
+        }
+
+        const customer = {
+            name: read("name"),
+            email: read("tnm-email"),
+            phone: read("phone"),
+            address: read("address"),
+            city: read("city"),
+            state: read("tnm-state"),
+            pincode: read("pincode")
+        };
+
+        if (
+            customer.name.length < 2 ||
+            customer.address.length < 8 ||
+            customer.city.length < 2 ||
+            customer.state.length < 2 ||
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email) ||
+            !/^[6-9]\d{9}$/.test(customer.phone) ||
+            !/^\d{6}$/.test(customer.pincode)
+        ) {
+            alert("Please complete all checkout details correctly.");
+            return;
+        }
+
+        if (testMode) {
+            customer.name = "TEST - " + customer.name;
+        }
+
+        const items = cart.map(item => ({
+            id: Number(item.id),
+            quantity: Number(item.quantity)
+        }));
+
+        const turnstileToken = window.turnstile?.getResponse() || "";
+
+        if (!turnstileToken) {
+            alert("Please complete Cloudflare verification.");
+            return;
+        }
+
+        // Reuse the same checkout ID on retries.
+        const storageKey = testMode
+            ? "tnm-cod-test-pending-v1"
+            : "tnm-cod-live-pending-v1";
+
+        const fingerprint = JSON.stringify({
+            customer,
+            items
+        });
+
+        let pending;
+
+        try {
+            pending = JSON.parse(
+                localStorage.getItem(storageKey) || "null"
+            );
+        } catch {
+            pending = null;
+        }
+
+        if (
+            !pending ||
+            pending.fingerprint !== fingerprint
+        ) {
+            pending = {
+                fingerprint,
+                id: crypto.randomUUID()
+            };
+
+            localStorage.setItem(
+                storageKey,
+                JSON.stringify(pending)
+            );
+        }
+
+        const button = document.querySelector(
+            '#checkout-modal button[onclick*="placeOrder"]'
+        );
+
+        placingCOD = true;
+
+        if (button) {
+            button.disabled = true;
+            button.textContent = "Placing order...";
+        }
+
+        try {
+            const response = await fetch(
+                "https://qpdmdtlegfidmemffqww.supabase.co/functions/v1/tnm-create-order",
+                {
+                    method: "POST",
+                    headers: {
+                        apikey: "sb_publishable_KZ7glLv-_8XOI2vczTS-zQ_1GlZFjOb",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        customer,
+                        items,
+                        turnstileToken,
+                        checkoutRequestId: pending.id
+                    })
+                }
+            );
+
+            const result = await response.json()
+                .catch(() => ({}));
+
+            if (!response.ok || !result.success) {
+                throw new Error(
+                    result.error ||
+                    `Checkout failed (${response.status})`
+                );
+            }
+
+            console.log(
+                "TNM COD checkout result:",
+                result
+            );
+
+            const amount = (
+                Number(result.totalPaise) / 100
+            ).toFixed(2);
+
+            alert(
+                (testMode ? "TEST ORDER " : "ORDER ") +
+                (result.alreadyExists
+                    ? "ALREADY RECORDED"
+                    : "PLACED SUCCESSFULLY") +
+                "\nOrder #" + result.orderNumber +
+                "\nTotal: ₹" + amount +
+                "\nPayment: Cash on Delivery" +
+                (testMode
+                    ? "\nThis is only a database test."
+                    : "")
+            );
+
+            if (!testMode) {
+                localStorage.removeItem(storageKey);
+
+                cart = [];
+                updateCart();
+
+                document.getElementById(
+                    "checkout-modal"
+                ).style.display = "none";
+            }
+
+            return result;
+
+        } catch (error) {
+            console.error(
+                "TNM COD checkout failed:",
+                error
+            );
+
+            alert(
+                "Could not confirm your order: " +
+                error.message +
+                "\nPlease retry after completing verification again."
+            );
+
+        } finally {
+            placingCOD = false;
+
+            if (button) {
+                button.disabled = false;
+            }
+
+            window.turnstile?.reset();
+
+            updateCODButton();
+        }
+    }
+
+    // Preview the real COD handler without activating it.
+    window.tnmPreviewCODCheckout = () => submitCOD(true);
+
+    // COD uses Supabase only when enabled.
+    // Online payments still use the existing WhatsApp flow.
+    placeOrder = function (...args) {
+        if (
+            ENABLE_DATABASE_COD &&
+            paymentMethod() === "cod"
+        ) {
+            return submitCOD(false);
+        }
+
+        return earlierPlaceOrder.apply(this, args);
+    };
+
+    const earlierCheckout = checkout;
+
+    checkout = function (...args) {
+        const result = earlierCheckout.apply(
+            this,
+            args
+        );
+
+        updateCODButton();
+
+        return result;
+    };
+
+    document.querySelectorAll(
+        'input[name="tnm-payment"]'
+    ).forEach(radio => {
+        radio.addEventListener(
+            "change",
+            updateCODButton
+        );
+    });
+
+    updateCODButton();
 })();
 
