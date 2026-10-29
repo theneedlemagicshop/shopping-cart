@@ -2656,3 +2656,66 @@ document.addEventListener("dragstart", function(e) {
 });
 
 const ENABLE_DATABASE_COD = false;
+
+
+/* CLOUDFLARE TURNSTILE CHECKOUT FIX */
+
+(function () {
+
+    const TURNSTILE_SITE_KEY = "0x4AAAAAAFra_QSNYE0e9jo2";
+
+    let turnstileWidgetId = null;
+
+    const previousCheckout = checkout;
+
+    checkout = function (...args) {
+
+        const result = previousCheckout.apply(this, args);
+
+        const modal = document.getElementById("checkout-modal");
+
+        if (!modal || getComputedStyle(modal).display === "none") {
+            return result;
+        }
+
+        let attempts = 0;
+
+        function showTurnstile() {
+
+            if (!window.turnstile) {
+                if (attempts++ < 20) {
+                    setTimeout(showTurnstile, 250);
+                }
+                return;
+            }
+
+            const container = document.getElementById("tnm-turnstile");
+
+            if (!container) {
+                console.error("Turnstile HTML container missing!");
+                return;
+            }
+
+            if (turnstileWidgetId === null) {
+
+                turnstileWidgetId = window.turnstile.render(
+                    container,
+                    {
+                        sitekey: TURNSTILE_SITE_KEY,
+                        action: "checkout",
+                        theme: "light"
+                    }
+                );
+
+            } else {
+                window.turnstile.reset(turnstileWidgetId);
+            }
+        }
+
+        showTurnstile();
+
+        return result;
+    };
+
+})();
+
