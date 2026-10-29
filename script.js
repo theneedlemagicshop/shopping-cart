@@ -2719,3 +2719,119 @@ const ENABLE_DATABASE_COD = false;
 
 })();
 
+
+/* THE NEEDLE MAGIC SHOP - TEST COD ORDER */
+
+(function () {
+
+    let testingCOD = false;
+
+    window.tnmTestCODOrder = async function () {
+
+        if (testingCOD) return;
+
+        const value = id =>
+            document.getElementById(id)?.value.trim() || "";
+
+        const method = document.querySelector(
+            'input[name="tnm-payment"]:checked'
+        )?.value;
+
+        if (method !== "cod") {
+            alert("Select Cash on Delivery first.");
+            return;
+        }
+
+        if (cart.length === 0) {
+            alert("Your cart is empty.");
+            return;
+        }
+
+        const customer = {
+            name: "TEST - " + value("name"),
+            email: value("tnm-email"),
+            phone: value("phone"),
+            address: value("address"),
+            city: value("city"),
+            state: value("tnm-state"),
+            pincode: value("pincode")
+        };
+
+        if (
+            !value("name") ||
+            !customer.email ||
+            !customer.phone ||
+            !customer.address ||
+            !customer.city ||
+            !customer.state ||
+            !customer.pincode
+        ) {
+            alert("Complete all checkout details first.");
+            return;
+        }
+
+        const token = window.turnstile?.getResponse() || "";
+
+        if (!token) {
+            alert("Complete Cloudflare verification first.");
+            return;
+        }
+
+        const items = cart.map(item => ({
+            id: Number(item.id),
+            quantity: Number(item.quantity)
+        }));
+
+        testingCOD = true;
+
+        try {
+            const response = await fetch(
+                "https://qpdmdtlegfidmemffqww.supabase.co/functions/v1/tnm-create-order",
+                {
+                    method: "POST",
+                    headers: {
+                        "apikey": "sb_publishable_KZ7glLv-_8XOI2vczTS-zQ_1GlZFjOb",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        customer,
+                        items,
+                        turnstileToken: token
+                    })
+                }
+            );
+
+            const result = await response.json()
+                .catch(() => ({}));
+
+            if (!response.ok || !result.success) {
+                throw new Error(
+                    result.error ||
+                    "Backend returned HTTP " + response.status
+                );
+            }
+
+            console.log("COD TEST SUCCESS:", result);
+
+            alert(
+                "✅ COD TEST ORDER SAVED!\n\n" +
+                "Order #" + result.orderNumber +
+                "\nTotal: ₹" +
+                (result.totalPaise / 100).toFixed(2) +
+                "\nSurprise Gift: " +
+                (result.surpriseGift ? "YES" : "NO") +
+                "\n\nThis is a test order."
+            );
+
+        } catch (error) {
+            console.error("COD TEST FAILED:", error);
+            alert("COD test failed: " + error.message);
+
+        } finally {
+            testingCOD = false;
+            window.turnstile?.reset();
+        }
+    };
+
+})();
+
