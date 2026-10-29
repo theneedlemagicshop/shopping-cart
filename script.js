@@ -2777,13 +2777,30 @@ const ENABLE_DATABASE_COD = false;
             return;
         }
 
-        const items = cart.map(item => ({
+                const items = cart.map(item => ({
             id: Number(item.id),
             quantity: Number(item.quantity)
         }));
 
-        testingCOD = true;
+        // Reuse the same ID when retrying the same test order.
+        const orderFingerprint = JSON.stringify({
+            customer,
+            items
+        });
 
+        if (
+            !window.tnmCodTestRequest ||
+            window.tnmCodTestRequest.fingerprint !== orderFingerprint
+        ) {
+            window.tnmCodTestRequest = {
+                fingerprint: orderFingerprint,
+                id: crypto.randomUUID()
+            };
+        }
+
+        const checkoutRequestId = window.tnmCodTestRequest.id;
+
+        testingCOD = true;
         try {
             const response = await fetch(
                 "https://qpdmdtlegfidmemffqww.supabase.co/functions/v1/tnm-create-order",
@@ -2793,10 +2810,11 @@ const ENABLE_DATABASE_COD = false;
                         "apikey": "sb_publishable_KZ7glLv-_8XOI2vczTS-zQ_1GlZFjOb",
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({
+                                        body: JSON.stringify({
                         customer,
                         items,
-                        turnstileToken: token
+                        turnstileToken: token,
+                        checkoutRequestId
                     })
                 }
             );
