@@ -291,8 +291,43 @@
         inputmode="numeric"
         oninput="this.value=this.value.replace(/[^0-9]/g,'')">
 
+<label for="tnm-email">Email Address</label>
+<input type="email" id="tnm-email"
+       placeholder="example@gmail.com">
+
+<label for="tnm-state">State</label>
+<input type="text" id="tnm-state"
+       placeholder="Your state">
+
+<h3>Choose Payment Method</h3>
+
+<label class="tnm-payment-option">
+    <input type="radio" name="tnm-payment"
+           value="online" checked>
+    <span>💳 Online Payment — No Extra Fee</span>
+</label>
+
+<label class="tnm-payment-option">
+    <input type="radio" name="tnm-payment"
+           value="cod">
+    <span>💵 Cash on Delivery — +₹49</span>
+</label>
+
+<h3>Order Breakdown</h3>
+<div id="tnm-checkout-breakdown"></div>
+
+<p class="tnm-payment-notice">
+    Online payments are not connected yet.
+    Orders will temporarily be sent through WhatsApp.
+</p>
+
+<!-- Secure checkout verification -->
+<div id="tnm-turnstile"
+     style="margin: 18px 0;">
+</div>
+
 <button id="place-order-btn" onclick="placeOrder()">
-    Place Order
+    Continue on WhatsApp (Temporary)
 </button>
 
 </div>
@@ -368,14 +403,52 @@
         </button>
     </div>
 
-    <div id="cart-drawer-items"></div>
+    <div id="tnm-rewards">
+    <strong id="tnm-reward-message">
+        Add products to unlock rewards!
+    </strong>
+
+    <div class="tnm-reward-track">
+        <div id="tnm-reward-progress"></div>
+    </div>
+
+    <div class="tnm-reward-milestones">
+        <span class="unlocked">🚚 Free Shipping</span>
+        <span id="tnm-gift-milestone">🎁 ₹299 Gift</span>
+        <span id="tnm-discount-milestone">🏷️ ₹499 10% OFF</span>
+    </div>
+</div>
+
+<div id="cart-drawer-items"></div>
 
     <div class="cart-drawer-footer">
 
-        <div class="cart-drawer-total">
-            <span>Total</span>
-            <strong>₹<span id="drawer-total">0</span></strong>
-        </div>
+        <div class="tnm-drawer-summary">
+    <div>
+        <span>Subtotal</span>
+        <strong id="tnm-drawer-subtotal">₹0.00</strong>
+    </div>
+
+    <div>
+        <span>10% Discount</span>
+        <strong id="tnm-drawer-discount">₹0.00</strong>
+    </div>
+
+    <div>
+        <span>Shipping</span>
+        <strong class="tnm-free">FREE</strong>
+    </div>
+
+    <div>
+        <span>Surprise Free Gift</span>
+        <strong id="tnm-drawer-gift">Locked</strong>
+    </div>
+</div>
+
+<div class="cart-drawer-total">
+    <span>Total</span>
+    <strong>₹<span id="drawer-total">0</span></strong>
+</div>
 
         <button class="drawer-checkout-btn" onclick="closeCartDrawer(); checkout();">
             Checkout
@@ -390,6 +463,18 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+    defer>
+</script>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
+
+<script
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+    defer>
+</script>
+
 <script src="script.js"></script>
 
 

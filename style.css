@@ -3990,3 +3990,437 @@ body:has(#quick-view-modal[style*="display:flex"]) {
     font-weight: 600;
     line-height: 1;
 }
+
+
+/* THE NEEDLE MAGIC SHOP - CART REWARDS */
+
+#tnm-rewards {
+    padding: 20px;
+    background: #fffaf0;
+    border-bottom: 1px solid #eee6d7;
+}
+
+#tnm-reward-message {
+    display: block;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.tnm-reward-track {
+    width: 100%;
+    height: 10px;
+    background: #ece5d8;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+#tnm-reward-progress {
+    width: 0%;
+    height: 100%;
+    background: #f4b324;
+    border-radius: 20px;
+    transition: width .35s ease;
+}
+
+.tnm-reward-milestones {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 15px;
+    font-size: 11px;
+    text-align: center;
+    color: #999;
+}
+
+.tnm-reward-milestones span {
+    flex: 1;
+}
+
+.tnm-reward-milestones .unlocked {
+    color: #17803c;
+    font-weight: 700;
+}
+
+.tnm-surprise-gift {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff6db;
+    padding: 14px;
+    margin-top: 15px;
+    border: 1px solid #f3dfa5;
+    border-radius: 14px;
+}
+
+.tnm-surprise-gift > span {
+    font-size: 27px;
+}
+
+.tnm-surprise-gift > div {
+    flex: 1;
+}
+
+.tnm-surprise-gift small {
+    display: block;
+    color: #777;
+    margin-top: 4px;
+    font-size: 11px;
+}
+
+.tnm-surprise-gift b,
+.tnm-free {
+    color: #17803c;
+}
+
+.tnm-drawer-summary > div,
+#tnm-checkout-breakdown > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    font-size: 13px;
+}
+
+.tnm-drawer-summary {
+    border-bottom: 1px solid #eee;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+}
+
+#cart-drawer-items {
+    min-height: 0;
+}
+
+#cart-drawer .cart-drawer-footer {
+    padding: 15px 20px;
+}
+
+#checkout-form .tnm-payment-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    margin: 12px 0;
+    cursor: pointer;
+}
+
+#checkout-form .tnm-payment-option input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    flex-shrink: 0;
+    accent-color: #203b49;
+}
+
+#checkout-form .tnm-payment-option span {
+    font-size: 14px;
+}
+
+#tnm-checkout-breakdown {
+    background: #fafafa;
+    padding: 16px;
+    border-radius: 12px;
+}
+
+#tnm-checkout-breakdown .tnm-checkout-total {
+    border-top: 1px solid #ddd;
+    margin-top: 10px;
+    padding-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.tnm-payment-notice {
+    color: #777;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+@media (max-width: 500px) {
+    #tnm-rewards {
+        padding: 16px;
+    }
+
+    .tnm-reward-milestones {
+        font-size: 10px;
+    }
+}
+
+
+/* COMPACT FOOTER - MOBILE ONLY */
+
+@media (max-width: 700px) {
+
+    .tnm-footer {
+        padding: 0 14px;
+        margin: 20px auto 10px;
+        border-radius: 14px;
+    }
+
+    .tnm-footer-inner {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px 12px;
+        padding: 18px 0 12px;
+    }
+
+    /* Store name takes full width */
+    .tnm-footer-brand {
+        grid-column: 1 / -1;
+    }
+
+    .tnm-footer h2 {
+        font-size: 17px;
+        margin-bottom: 5px;
+    }
+
+    .tnm-footer h3 {
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .tnm-footer p {
+        font-size: 11px;
+        line-height: 1.5;
+    }
+
+    .tnm-footer-links {
+        gap: 8px;
+    }
+
+    .tnm-footer a {
+        font-size: 11px;
+    }
+
+    .tnm-footer .tnm-contact-link {
+        margin-top: 9px;
+        padding: 8px 9px;
+        font-size: 10px;
+    }
+
+    .tnm-footer-bottom {
+        padding: 10px 0;
+        font-size: 10px;
+        gap: 6px;
+    }
+
+}
+
+
+/* FLOATING REWARD NOTIFICATION */
+
+.tnm-reward-popup {
+    position: fixed;
+    top: calc(18px + env(safe-area-inset-top));
+    left: 50%;
+    transform: translate(-50%, calc(-100% - 40px));
+    width: calc(100% - 32px);
+    max-width: 390px;
+    padding: 16px 18px;
+    background: #fff;
+    border: 1px solid #f1dfba;
+    border-radius: 16px;
+    box-shadow: 0 10px 35px rgba(0,0,0,.16);
+    z-index: 20000;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+    transform .55s cubic-bezier(.55, 0, 1, .45),
+    opacity .3s ease,
+    visibility 0s linear .55s;
+    box-sizing: border-box;
+}
+
+.tnm-reward-popup.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+
+    transition:
+        transform .65s cubic-bezier(.22, 1, .36, 1),
+        opacity .3s ease,
+        visibility 0s;
+}
+
+.tnm-reward-popup-title {
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    color: #203b49;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.tnm-reward-popup-track {
+    height: 9px;
+    background: #eee9df;
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.tnm-reward-popup-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        #f8cb63, #f2a91f);
+    border-radius: 30px;
+}
+
+.tnm-reward-popup-caption {
+    font-size: 11px;
+    color: #777;
+    text-align: center;
+    margin-top: 9px;
+}
+
+@media (max-width: 600px) {
+    .tnm-reward-popup {
+        padding: 14px;
+        max-width: 350px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tnm-reward-popup {
+        transition: none;
+    }
+    .tnm-reward-popup-fill {
+        transition: none !important;
+    }
+}
+
+
+/* FIX REWARD POPUP SLIDE-UP EXIT */
+
+.tnm-reward-popup {
+    visibility: visible;
+    opacity: 0;
+
+    transform: translate(
+        -50%,
+        calc(-100% - 50px)
+    );
+
+    transition:
+        transform .7s cubic-bezier(.55, 0, 1, .45),
+        opacity .2s ease .45s;
+}
+
+.tnm-reward-popup.show {
+    visibility: visible;
+    opacity: 1;
+
+    transform: translate(-50%, 0);
+
+    transition:
+        transform .65s cubic-bezier(.22, 1, .36, 1),
+        opacity .2s ease;
+}
+
+
+/* DISABLE TEXT AND IMAGE SELECTION - ALL DEVICES */
+
+html, body, body * {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+}
+
+/* Prevent long-press selection menus on iPhone */
+img {
+    -webkit-touch-callout: none !important;
+    -webkit-user-drag: none !important;
+    user-select: none !important;
+}
+
+/* Keep checkout forms usable */
+input, textarea, select {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    user-select: text !important;
+}
+
+
+/* CHECKOUT PRODUCT LIST */
+
+#tnm-checkout-breakdown .tnm-checkout-products {
+    display: block;
+    width: 100%;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.tnm-checkout-products h4 {
+    margin: 0 0 14px;
+    font-size: 16px;
+    color: #203b49;
+}
+
+.tnm-checkout-product {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.tnm-checkout-product:last-child {
+    border-bottom: none;
+}
+
+.tnm-checkout-product img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    border-radius: 9px;
+    background: #f5f5f5;
+    flex-shrink: 0;
+}
+
+.tnm-checkout-product-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.tnm-checkout-product-info strong {
+    display: block;
+    font-size: 13px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.tnm-checkout-product-info small {
+    display: block;
+    color: #777;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+.tnm-checkout-product-price {
+    font-size: 13px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+@media (max-width: 500px) {
+    .tnm-checkout-product {
+        gap: 9px;
+    }
+
+    .tnm-checkout-product img {
+        width: 45px;
+        height: 45px;
+    }
+
+    .tnm-checkout-product-info strong {
+        font-size: 12px;
+    }
+}

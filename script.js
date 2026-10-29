@@ -2240,3 +2240,407 @@ function smoothScrollToTop() {
     requestAnimationFrame(animate);
 }
 
+
+/* THE NEEDLE MAGIC SHOP — REWARDS + PAYMENT PREVIEW */
+(function () {
+  const rupees = value => "₹" + value.toLocaleString("en-IN", {
+    minimumFractionDigits: 2, maximumFractionDigits: 2
+  });
+
+  function calculateTNM(method = "online") {
+    const subtotal = cart.reduce((sum, item) => {
+      const product = products.find(p => p.id === item.id);
+      return sum + (product ? product.price * item.quantity : 0);
+    }, 0);
+    const gift = subtotal >= 299;
+    const discount = subtotal >= 499 ? Math.round(subtotal * 10) / 100 : 0;
+    const codFee = method === "cod" && cart.length ? 49 : 0;
+    return { subtotal, gift, discount, codFee,
+      total: subtotal - discount + codFee };
+  }
+
+  
+function updateTNMCheckout() {
+    const box = document.getElementById("tnm-checkout-breakdown");
+    if (!box) return;
+
+    const method = document.querySelector(
+        'input[name="tnm-payment"]:checked'
+    )?.value || "online";
+
+    const t = calculateTNM(method);
+
+    // Escape text safely before displaying it
+    const escapeHTML = value => String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
+    // Show all products in the order
+    const productList = cart.map(item => {
+        const product = products.find(p => p.id === item.id);
+        if (!product) return "";
+
+        const name = product.name
+            .replace(/<br\s*\/?>/gi, " ")
+            .replace(/<[^>]*>/g, "");
+
+        return `
+            <div class="tnm-checkout-product">
+                <img src="${escapeHTML(product.image)}"
+                     alt="${escapeHTML(name)}">
+
+                <div class="tnm-checkout-product-info">
+                    <strong>${escapeHTML(name)}</strong>
+                    <small>Quantity: ${item.quantity}</small>
+                </div>
+
+                <strong class="tnm-checkout-product-price">
+                    ${rupees(product.price * item.quantity)}
+                </strong>
+            </div>
+        `;
+    }).join("");
+
+    box.innerHTML = `
+        <div class="tnm-checkout-products">
+            <h4>🛍️ Your Products</h4>
+            ${productList}
+        </div>
+
+        <div>
+            <span>Products subtotal</span>
+            <strong>${rupees(t.subtotal)}</strong>
+        </div>
+
+        <div>
+            <span>10% automatic discount</span>
+            <strong>${t.discount ? "−" + rupees(t.discount) : "₹0.00"}</strong>
+        </div>
+
+        <div>
+            <span>Shipping</span>
+            <strong style="color:green;">FREE</strong>
+        </div>
+
+        <div>
+            <span>Surprise Free Gift</span>
+            <strong>${t.gift ? "FREE 🎁" : "Unlock at ₹299"}</strong>
+        </div>
+
+        ${method === "cod" ? `
+            <div>
+                <span>Cash on Delivery fee</span>
+                <strong>+${rupees(49)}</strong>
+            </div>
+        ` : ""}
+
+        <div class="tnm-checkout-total">
+            <span>Total to pay</span>
+            <strong>${rupees(t.total)}</strong>
+        </div>
+    `;
+}
+
+
+  function updateTNMRewards() {
+    const t = calculateTNM(); // Cart uses online/base total; ₹49 only after COD selection.
+    const message = document.getElementById("tnm-reward-message");
+    if (message) {
+      message.textContent = !cart.length ? "Add products to unlock rewards!"
+        : !t.gift ? `Add ${rupees(299 - t.subtotal)} more for a Surprise Free Gift! 🎁`
+        : !t.discount ? `Surprise Free Gift unlocked! Add ${rupees(499 - t.subtotal)} more for 10% OFF!`
+        : "🎉 You unlocked a Surprise Free Gift + 10% OFF!";
+    }
+    const bar = document.getElementById("tnm-reward-progress");
+    if (bar) bar.style.width = Math.min(100, t.subtotal / 499 * 100) + "%";
+    document.getElementById("tnm-gift-milestone")?.classList.toggle("unlocked", t.gift);
+    document.getElementById("tnm-discount-milestone")?.classList.toggle("unlocked", !!t.discount);
+
+    const drawerItems = document.getElementById("cart-drawer-items");
+    if (drawerItems) {
+      drawerItems.querySelector("#tnm-surprise-gift")?.remove();
+      if (t.gift) {
+        drawerItems.insertAdjacentHTML("beforeend", `
+          <div class="tnm-surprise-gift" id="tnm-surprise-gift">
+            <span>🎁</span><div><strong>Surprise Free Gift</strong>
+            <small>Handpicked by The Needle Magic Shop</small></div><b>FREE</b>
+          </div>`);
+      }
+    }
+    const set = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    };
+    set("tnm-drawer-subtotal", rupees(t.subtotal));
+    const discountRow = document
+    .getElementById("tnm-drawer-discount")
+    ?.parentElement;
+
+if (discountRow) {
+    discountRow.style.display = t.discount > 0 ? "flex" : "none";
+}
+
+set("tnm-drawer-discount", "−" + rupees(t.discount));
+    set("tnm-drawer-gift", t.gift ? "FREE 🎁" : "Unlock at ₹299");
+    set("drawer-total", t.total.toFixed(2));
+    set("subtotal", t.subtotal.toFixed(2));
+    set("total", t.total.toFixed(2));
+    updateTNMCheckout();
+  }
+
+  // Keep your original cart, quantity controls, Quick View and search intact.
+  const oldDrawerUpdate = updateCartDrawer;
+  updateCartDrawer = function () {
+    oldDrawerUpdate();
+    updateTNMRewards();
+  };
+  const oldCartUpdate = updateCart;
+  updateCart = function () {
+    oldCartUpdate();
+    updateTNMRewards();
+  };
+
+  checkout = function () {
+    if (!cart.length) return alert("Your cart is empty!");
+    closeCartDrawer();
+    updateTNMCheckout();
+    document.getElementById("checkout-modal").style.display = "block";
+  };
+
+  // Temporary WhatsApp handoff only; real payments and emails require backend setup.
+  placeOrder = function () {
+    const value = id => document.getElementById(id)?.value.trim() || "";
+    const name = value("name"), email = value("tnm-email");
+    const phone = value("phone"), address = value("address");
+    const city = value("city"), state = value("tnm-state");
+    const pincode = value("pincode");
+    if (!name || !email || !phone || !address || !city || !state || !pincode)
+      return alert("Please fill in all delivery details.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return alert("Please enter a valid email address.");
+    if (!/^[6-9]\d{9}$/.test(phone))
+      return alert("Please enter a valid 10-digit Indian mobile number.");
+    if (!/^\d{6}$/.test(pincode))
+      return alert("Please enter a valid 6-digit PIN code.");
+
+    const method = document.querySelector('input[name="tnm-payment"]:checked')?.value || "online";
+    const t = calculateTNM(method);
+    const itemLines = cart.map(item => {
+      const product = products.find(p => p.id === item.id);
+      return product ? `${product.name.replace(/<br\s*\/?\s*>/gi, " ")} × ${item.quantity} — ${rupees(product.price * item.quantity)}` : "";
+    }).filter(Boolean).join("\n");
+    const lines = [
+      "THE NEEDLE MAGIC SHOP — ORDER REQUEST", "", itemLines,
+      t.gift ? "🎁 Surprise Free Gift ×1 — FREE (shop picks the gift)" : "",
+      "", `Subtotal: ${rupees(t.subtotal)}`,
+      `Automatic 10% discount: −${rupees(t.discount)}`,
+      "Shipping: FREE", `COD fee: ${rupees(t.codFee)}`,
+      `TOTAL: ${rupees(t.total)}`,
+      `Payment preference: ${method === "cod" ? "Cash on Delivery" : "Online (not yet processed)"}`,
+      "", `Name: ${name}`, `Email: ${email}`, `Phone: +91${phone}`,
+      `Address: ${address}`, `City: ${city}`, `State: ${state}`, `PIN: ${pincode}`,
+      "", "Please confirm this order and payment arrangements."
+    ].filter(Boolean);
+    window.open("https://wa.me/918588827327?text=" + encodeURIComponent(lines.join("\n")), "_blank");
+    alert("Your order request is ready in WhatsApp. Please press Send there. No online payment or confirmation email has been processed yet.");
+  };
+
+  document.querySelectorAll('input[name="tnm-payment"]').forEach(radio =>
+    radio.addEventListener("change", updateTNMCheckout));
+  updateCart();
+})();
+
+
+/* THE NEEDLE MAGIC SHOP - REWARD POPUP */
+(function () {
+
+    const getSubtotal = () => cart.reduce(
+        (sum, item) =>
+            sum + Number(item.price || 0) *
+            Number(item.quantity || 0),
+        0
+    );
+
+    const money = n => "₹" + n.toLocaleString("en-IN");
+
+    // Create popup automatically
+    const popup = document.createElement("div");
+    popup.className = "tnm-reward-popup";
+    popup.setAttribute("role", "status");
+    popup.setAttribute("aria-live", "polite");
+
+    popup.innerHTML = `
+        <div class="tnm-reward-popup-title"></div>
+        <div class="tnm-reward-popup-track">
+            <div class="tnm-reward-popup-fill"></div>
+        </div>
+        <div class="tnm-reward-popup-caption"></div>
+    `;
+
+    document.body.appendChild(popup);
+
+    const title = popup.querySelector(
+        ".tnm-reward-popup-title"
+    );
+    const bar = popup.querySelector(
+        ".tnm-reward-popup-fill"
+    );
+    const caption = popup.querySelector(
+        ".tnm-reward-popup-caption"
+    );
+
+    let lastSubtotal = getSubtotal();
+    let hideTimer;
+
+    function progress(n) {
+        if (n < 299) return n / 299 * 100;
+        if (n < 499) return (n - 299) / 200 * 100;
+        return 100;
+    }
+
+    function showRewardPopup(before, after) {
+
+        // Don't show reward popups while the cart is open
+if (document.getElementById("cart-drawer")?.classList.contains("open")) {
+    clearTimeout(hideTimer);
+    popup.classList.remove("show");
+    return;
+}
+
+        const giftUnlocked =
+            before < 299 && after >= 299;
+
+        const discountUnlocked =
+            before < 499 && after >= 499;
+
+        const celebration =
+            giftUnlocked || discountUnlocked;
+
+        if (after === 0) {
+            title.textContent = "🛒 Cart cleared";
+            caption.textContent = "Rewards reset";
+        }
+        else if (discountUnlocked) {
+            title.textContent =
+                "🎉 10% OFF unlocked!";
+            caption.textContent =
+                "Surprise Free Gift also included!";
+        }
+        else if (giftUnlocked) {
+            title.textContent =
+                "🎁 Surprise Free Gift unlocked!";
+            caption.textContent =
+                money(Math.max(0, 499 - after)) +
+                " more for 10% OFF!";
+        }
+        else if (after < 299) {
+            title.textContent =
+                "🎁 " + money(299 - after) +
+                " away from your free gift!";
+            caption.textContent =
+                "Next reward: ₹299 Surprise Free Gift";
+        }
+        else if (after < 499) {
+            title.textContent =
+                "🏷️ " + money(499 - after) +
+                " away from 10% OFF!";
+            caption.textContent =
+                "Your Surprise Free Gift is unlocked!";
+        }
+        else {
+            title.textContent =
+                "✨ Gift + 10% OFF unlocked!";
+            caption.textContent =
+                "Free shipping included!";
+        }
+
+        // Animate toward the next reward
+        const start = giftUnlocked
+            ? Math.min(100, before / 299 * 100)
+            : discountUnlocked && before >= 299
+                ? Math.min(100, (before - 299) / 200 * 100)
+                : progress(before);
+
+        const end = celebration ? 100 : progress(after);
+
+        clearTimeout(hideTimer);
+
+        popup.classList.add("show");
+
+        bar.style.transition = "none";
+        bar.style.width = start + "%";
+
+        // Restart progress animation
+        void bar.offsetWidth;
+
+        bar.style.transition = "width .7s ease-out";
+        bar.style.width = end + "%";
+
+        // Small confetti only when a reward unlocks
+        if (celebration &&
+            typeof window.confetti === "function") {
+
+            window.confetti({
+                particleCount: 42,
+                spread: 55,
+                startVelocity: 22,
+                scalar: .65,
+                gravity: 1.1,
+                origin: { x: .5, y: .15 },
+                disableForReducedMotion: true,
+                zIndex: 20002
+            });
+        }
+
+        hideTimer = setTimeout(() => {
+            popup.classList.remove("show");
+        }, 4100);
+    }
+
+    // Automatically hide popup when cart opens
+const originalOpenCartDrawer = openCartDrawer;
+
+openCartDrawer = function (...args) {
+    const result = originalOpenCartDrawer.apply(this, args);
+
+    clearTimeout(hideTimer);
+    popup.classList.remove("show");
+
+    return result;
+};
+
+    // Listen to existing cart updates
+    const originalUpdateCart = updateCart;
+
+    updateCart = function (...args) {
+        const before = lastSubtotal;
+
+        const result = originalUpdateCart.apply(
+            this, args
+        );
+
+        const after = getSubtotal();
+
+        if (after !== before) {
+            showRewardPopup(before, after);
+        }
+
+        lastSubtotal = after;
+        return result;
+    };
+
+})();
+
+
+/* PREVENT IMAGE DRAGGING */
+
+document.addEventListener("dragstart", function(e) {
+    if (e.target.closest("img")) {
+        e.preventDefault();
+    }
+});
+
+const ENABLE_DATABASE_COD = false;
