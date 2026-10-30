@@ -3101,3 +3101,332 @@ const ENABLE_DATABASE_COD = true;
     updateCODButton();
 })();
 
+
+/* TNM - RAZORPAY TEST CHECKOUT
+   Visible only with ?razorpay-test=1
+   Does not affect COD or live online checkout.
+*/
+(function () {
+    const params = new URLSearchParams(location.search);
+    if (params.get("razorpay-test") !== "1") return;
+
+    const API = "https://qpdmdtlegfidmemffqww.supabase.co/functions/v1/";
+    const PUBLIC_KEY = "sb_publishable_KZ7glLv-_8XOI2vczTS-zQ_1GlZFjOb";
+    const STORAGE_KEY = "tnm-razorpay-test-request";
+
+    let busy = false;
+    let testButton = null;
+
+    const read = id =>
+        document.getElementById(id)?.value.trim() || "";
+
+    function setBusy(value) {
+        busy = value;
+        if (testButton) {
+            testButton.disabled = value;
+            testButton.textContent = value
+                ? "Processing test payment..."
+                : "Pay Online - Razorpay TEST";
+        }
+    }
+
+    function resetVerification() {
+        try {
+            window.turnstile?.reset();
+        } catch (error) {
+            console.warn("Turnstile reset:", error);
+        }
+    }
+
+    function loadRazorpay() {
+        if (window.Razorpay) return Promise.resolve();
+
+        return new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://checkout.razorpay.com/v1/checkout.js";
+            script.onload = () => {
+                if (window.Razorpay) resolve();
+                else reject(new Error("Razorpay did not load."));
+            };
+            script.onerror = () =>
+                reject(new Error("Could not load Razorpay checkout."));
+            document.head.appendChild(script);
+        });
+    }
+
+    async function callBackend(functionName, payload) {
+        const response = await fetch(API + functionName, {
+            method: "POST",
+            headers: {
+                apikey: PUBLIC_KEY,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            throw new Error(
+                data.error || `Server error ${response.status}`
+            );
+        }
+
+        return data;
+    }
+
+    async function startRazorpayTest() {
+        if (busy) return;
+
+        const method = document.querySelector(
+            'input[name="tnm-payment"]:checked'
+        )?.value;
+
+        if (method !== "online") {
+            alert("Select Online Payment first.");
+            return;
+        }
+
+        if (!cart.length) {
+            alert("Add a product to your cart first.");
+            return;
+        }
+
+        const customer = {
+            name: read("name"),
+            email: read("tnm-email"),
+            phone: read("phone"),
+            address: read("address"),
+            city: read("city"),
+            state: read("tnm-state"),
+            pincode: read("pincode")
+        };
+
+        if (
+            customer.name.length < 2 ||
+            customer.address.length < 8 ||
+            customer.city.length < 2 ||
+            customer.state.length < 2 ||
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email) ||
+            !/^[6-9]\d{9}$/.test(customer.phone) ||
+            !/^\d{6}$/.test(customer.pincode)
+        ) {
+            alert("Please complete all delivery details correctly.");
+            return;
+        }
+
+        const turnstileToken =
+            window.turnstile?.getResponse() || "";
+
+        if (!turnstileToken) {
+            alert("Complete Cloudflare verification first.");
+            return;
+        }
+
+        const items = cart.map(item => ({
+            id: Number(item.id),
+            quantity: Number(item.quantity)
+        }));
+
+        const fingerprint = JSON.stringify({
+            customer,
+            items
+        });
+
+        let pending = null;
+
+        try {
+            pending = JSON.parse(
+                sessionStorage.getItem(STORAGE_KEY) || "null"
+            );
+        } catch {
+            pending = null;
+        }
+
+        if (!pending || pending.fingerprint !== fingerprint) {
+            pending = {
+                id: crypto.randomUUID(),
+                fingerprint
+            };
+
+            sessionStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(pending)
+            );
+        }
+
+        setBusy(true);
+
+        try {
+            await loadRazorpay();
+
+            // Secure server creates the Razorpay test order.
+            const order = await callBackend(
+                "tnm-razorpay-create-order",
+                {
+                    customer,
+                    items,
+                    turnstileToken,
+                    checkoutRequestId: pending.id
+                }
+            );
+
+            if (!order.success) {
+                throw new Error("Could not create test order.");
+            }
+
+            const options = {
+                key: order.keyId,
+                amount: order.amount,
+                currency: "INR",
+                name: "The Needle Magic Shop",
+                description: "TEST PAYMENT - No real money",
+                order_id: order.razorpayOrderId,
+
+                prefill: {
+                    name: customer.name,
+                    email: customer.email,
+                    contact: customer.phone
+                },
+
+                theme: {
+                    color: "#203D4C"
+                },
+
+                handler: async function (payment) {
+                    try {
+                        const result = await callBackend(
+                            "tnm-razorpay-verify-payment",
+                            {
+                                checkoutRequestId: pending.id,
+                                razorpay_order_id:
+                                    payment.razorpay_order_id,
+                                razorpay_payment_id:
+                                    payment.razorpay_payment_id,
+                                razorpay_signature:
+                                    payment.razorpay_signature
+                            }
+                        );
+
+                        console.log(
+                            "TNM Razorpay verification:",
+                            result
+                        );
+
+                        if (
+                            result.success === true &&
+                            result.paymentStatus === "paid"
+                        ) {
+                            sessionStorage.removeItem(STORAGE_KEY);
+
+                            alert(
+                                "TEST PAYMENT VERIFIED!\n\n" +
+                                "Amount: ₹" +
+                                (order.amount / 100).toFixed(2) +
+                                "\nRecorded in Supabase." +
+                                "\n\nNo real money was charged." +
+                                "\nNo customer order was placed."
+                            );
+
+                        } else {
+                            alert(
+                                "Test payment is not yet confirmed " +
+                                "as captured.\n\n" +
+                                "Check Razorpay and Supabase " +
+                                "before retrying."
+                            );
+                        }
+
+                    } catch (error) {
+                        console.error(
+                            "Test verification error:",
+                            error
+                        );
+
+                        alert(
+                            "Could not confirm payment status: " +
+                            error.message +
+                            "\n\nCheck Razorpay before retrying."
+                        );
+
+                    } finally {
+                        resetVerification();
+                        setBusy(false);
+                    }
+                },
+
+                modal: {
+                    ondismiss: function () {
+                        resetVerification();
+                        setBusy(false);
+                    }
+                }
+            };
+
+            const checkout = new window.Razorpay(options);
+
+            checkout.on("payment.failed", function (response) {
+                console.warn(
+                    "Razorpay test payment failed:",
+                    response.error?.description
+                );
+            });
+
+            checkout.open();
+
+        } catch (error) {
+            console.error("Razorpay test error:", error);
+            alert("Razorpay test error: " + error.message);
+            resetVerification();
+            setBusy(false);
+        }
+    }
+
+    function addTestButton() {
+        const placeOrderButton = document.querySelector(
+            '#checkout-modal button[onclick*="placeOrder"]'
+        );
+
+        if (!placeOrderButton || document.getElementById(
+            "tnm-razorpay-test-button"
+        )) return;
+
+        testButton = document.createElement("button");
+        testButton.id = "tnm-razorpay-test-button";
+        testButton.type = "button";
+        testButton.textContent = "Pay Online - Razorpay TEST";
+
+        testButton.style.cssText = `
+            display: block;
+            width: 100%;
+            padding: 13px;
+            margin: 12px 0;
+            background: #203D4C;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+        `;
+
+        testButton.addEventListener(
+            "click",
+            startRazorpayTest
+        );
+
+        placeOrderButton.parentNode.insertBefore(
+            testButton,
+            placeOrderButton
+        );
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener(
+            "DOMContentLoaded",
+            addTestButton
+        );
+    } else {
+        addTestButton();
+    }
+})();
+
