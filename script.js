@@ -3283,6 +3283,20 @@ const ENABLE_DATABASE_COD = true;
                 description: "TEST PAYMENT - No real money",
                 order_id: order.razorpayOrderId,
 
+                config: {
+    display: {
+        sequence: [
+            "upi",
+            "card",
+            "netbanking",
+            "wallet"
+        ],
+        preferences: {
+            show_default_blocks: true
+        }
+    }
+},
+
                 prefill: {
                     name: customer.name,
                     email: customer.email,
