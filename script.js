@@ -3495,10 +3495,15 @@ function updateButton() {
     const button = mainButton();
     const method = paymentMethod();
 
-    // Preserve the existing COD button behaviour.
-    if (button && method === "online") {
-        button.textContent = "Pay Securely Online";
+    
+    // Always show the correct payment button.
+    if (button) {
+        button.textContent =
+            method === "cod"
+                ? "Place COD Order"
+                : "Pay Securely Online";
     }
+
 
     // Update the checkout notice only when
     // the Live Razorpay integration is enabled.
