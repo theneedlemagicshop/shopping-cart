@@ -4389,3 +4389,703 @@ alert(
 
 })();
 
+
+/* The Needle Magic Shop — optional, browser-only saved addresses (max 10).
+   Paste ONCE at the very bottom of script.js, after the PIN auto-fill snippet. */
+(function () {
+  function start() {
+    const form = document.getElementById('checkout-form');
+    if (!form || document.getElementById('tnm-address-book')) return;
+
+    const keys = ['name', 'phone', 'tnm-email', 'pincode', 'city', 'tnm-state', 'address'];
+    const fields = Object.fromEntries(keys.map(k => [k, document.getElementById(k)]));
+    if (keys.some(k => !fields[k])) return;
+
+    const STORAGE_KEY = 'tnm-saved-delivery-addresses-v1';
+    const MAX = 10;
+    const COLORS = '#203D4C';
+    let selectedId = null;
+    let selectedSnapshot = '';
+    let declined = false;
+    let isFilling = false;
+    let showingList = false;
+    let storageOK = true;
+    let saved = [];
+
+    function getDetails() {
+      return {
+        name: fields.name.value.trim(),
+        phone: fields.phone.value.trim(),
+        email: fields['tnm-email'].value.trim(),
+        pincode: fields.pincode.value.trim(),
+        city: fields.city.value.trim(),
+        state: fields['tnm-state'].value.trim(),
+        address: fields.address.value.trim()
+      };
+    }
+
+    function valid(d) {
+      return d.name.length >= 2 && /^[6-9]\d{9}$/.test(d.phone) &&
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email) &&
+        /^\d{6}$/.test(d.pincode) && d.city.length >= 2 &&
+        d.state.length >= 2 && d.address.length >= 8;
+    }
+
+    const snapshot = d => JSON.stringify(d);
+    const byId = id => saved.find(x => x.id === id);
+
+    function load() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        if (!Array.isArray(raw)) return [];
+        return raw.filter(x => x && typeof x.id === 'string' &&
+          typeof x.label === 'string' && x.details && valid(x.details))
+          .slice(0, MAX);
+      } catch (e) {
+        if (e && e.name === 'SecurityError') storageOK = false;
+        return [];
+      }
+    }
+
+    function persist() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+        storageOK = true;
+        return true;
+      } catch (e) {
+        storageOK = false;
+        alert('This browser cannot save addresses right now. Please check storage/privacy settings.');
+        return false;
+      }
+    }
+
+    saved = load();
+
+    const style = document.createElement('style');
+    style.textContent = `
+      #tnm-address-book, #tnm-address-return {
+        box-sizing:border-box;
+        font-family:inherit;
+        color:${COLORS}
+      }
+      #tnm-address-book *, #tnm-address-return * {
+        box-sizing:border-box
+      }
+      .tnm-ab-box {
+        margin:16px 0 22px;
+        padding:16px;
+        border:1px solid #dce5e9;
+        border-radius:16px;
+        background:#f8fafb
+      }
+      .tnm-ab-heading {
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+        flex-wrap:wrap
+      }
+      .tnm-ab-heading strong {font-size:15px}
+      .tnm-ab-description {
+        font-size:12px;
+        line-height:1.55;
+        color:#637983;
+        margin:7px 0 0
+      }
+      .tnm-ab-buttons {
+        display:flex;
+        flex-wrap:wrap;
+        gap:9px;
+        margin-top:12px
+      }
+      .tnm-ab-btn {
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-height:37px;
+        padding:8px 13px;
+        border-radius:10px;
+        border:1px solid #aebdc5;
+        font-family:inherit;
+        font-size:13px;
+        font-weight:700;
+        cursor:pointer;
+        background:#fff;
+        color:${COLORS};
+        line-height:1.3
+      }
+      .tnm-ab-btn.primary {
+        background:${COLORS};
+        border-color:${COLORS};
+        color:#fff
+      }
+      .tnm-ab-btn.danger {
+        color:#ab3744;
+        border-color:#e9b8bf
+      }
+      .tnm-ab-btn:focus-visible {
+        outline:3px solid #65b9d1;
+        outline-offset:2px
+      }
+      .tnm-ab-btn:disabled {
+        opacity:.5;
+        cursor:not-allowed
+      }
+      .tnm-ab-list {
+        display:grid;
+        gap:11px;
+        margin-top:14px
+      }
+      .tnm-ab-card {
+        border:1px solid #d7e2e7;
+        border-radius:13px;
+        background:#fff;
+        padding:14px;
+        overflow-wrap:anywhere
+      }
+      .tnm-ab-card.selected {
+        border:2px solid ${COLORS};
+        padding:13px
+      }
+      .tnm-ab-title {
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:8px;
+        font-size:14px;
+        font-weight:750
+      }
+      .tnm-ab-selected {
+        font-size:11px;
+        color:#12764c;
+        font-weight:700
+      }
+      .tnm-ab-details {
+        font-size:12px;
+        line-height:1.7;
+        color:#536971;
+        margin-top:7px;
+        white-space:pre-line
+      }
+      .tnm-ab-note {
+        font-size:12px;
+        margin-top:11px;
+        line-height:1.5;
+        color:#487180
+      }
+      .tnm-ab-rename {
+        width:100%;
+        padding:9px 11px;
+        border:1px solid #aebdc5;
+        border-radius:9px;
+        margin-top:8px;
+        font:inherit;
+        font-size:14px
+      }
+      @media (max-width:480px) {
+        .tnm-ab-box {padding:13px}
+        .tnm-ab-btn {
+          font-size:12px;
+          padding:8px 11px
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Returning customer prompt.
+    const welcome = document.createElement('section');
+    welcome.id = 'tnm-address-return';
+    welcome.className = 'tnm-ab-box';
+    welcome.innerHTML = `
+      <strong>📍 Would you like to use a previously saved address?</strong>
+      <p class="tnm-ab-description">
+        Your saved delivery details are available on this device.
+      </p>
+      <div class="tnm-ab-buttons">
+        <button type="button" class="tnm-ab-btn primary" data-welcome="yes">
+          Yes, show addresses
+        </button>
+        <button type="button" class="tnm-ab-btn" data-welcome="no">
+          No, enter new details
+        </button>
+      </div>`;
+
+    const checkoutTitle = form.querySelector('h2');
+
+    if (checkoutTitle) {
+      checkoutTitle.insertAdjacentElement('afterend', welcome);
+    } else {
+      form.prepend(welcome);
+    }
+
+    // Saved addresses section, placed before payment.
+    const panel = document.createElement('section');
+    panel.id = 'tnm-address-book';
+    panel.className = 'tnm-ab-box';
+
+    panel.innerHTML = `
+      <div class="tnm-ab-heading">
+        <strong>
+          📍 Saved delivery addresses
+          <span id="tnm-ab-count"></span>
+        </strong>
+        <button type="button" class="tnm-ab-btn" id="tnm-ab-toggle">
+          View addresses
+        </button>
+      </div>
+
+      <p class="tnm-ab-description">
+        Optional. Save up to 10 addresses for faster checkout.
+      </p>
+
+      <div id="tnm-ab-choices" hidden>
+        <div id="tnm-ab-list" class="tnm-ab-list"></div>
+
+        <div class="tnm-ab-buttons">
+          <button type="button" class="tnm-ab-btn" id="tnm-ab-new">
+            ＋ Add new address
+          </button>
+        </div>
+      </div>
+
+      <div id="tnm-ab-prompt" hidden>
+        <div class="tnm-ab-heading" style="margin-top:15px">
+          <strong id="tnm-ab-question">
+            Would you like to save these details?
+          </strong>
+        </div>
+
+        <p class="tnm-ab-description">
+          Only on this browser. You can remove saved addresses anytime.
+        </p>
+
+        <div class="tnm-ab-buttons">
+          <button type="button" class="tnm-ab-btn primary" id="tnm-ab-save">
+            Yes, save details
+          </button>
+          <button type="button" class="tnm-ab-btn" id="tnm-ab-no">
+            No, thanks
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="tnm-ab-status"
+        class="tnm-ab-note"
+        role="status"
+        aria-live="polite"
+      ></div>`;
+
+    const payTitle = Array.from(form.querySelectorAll('h3'))
+      .find(h => /choose payment method/i.test(h.textContent));
+
+    if (payTitle) {
+      payTitle.insertAdjacentElement('beforebegin', panel);
+    } else {
+      fields.address.insertAdjacentElement('afterend', panel);
+    }
+
+    const $ = id => document.getElementById(id);
+
+    const count = $('tnm-ab-count');
+    const list = $('tnm-ab-list');
+    const choices = $('tnm-ab-choices');
+    const question = $('tnm-ab-question');
+    const prompt = $('tnm-ab-prompt');
+    const saveBtn = $('tnm-ab-save');
+    const toggle = $('tnm-ab-toggle');
+    const status = $('tnm-ab-status');
+
+    function message(text) {
+      status.textContent = text || '';
+    }
+
+    function button(label, fn, kind = '') {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'tnm-ab-btn ' + kind;
+      b.textContent = label;
+      b.addEventListener('click', fn);
+      return b;
+    }
+
+    function fill(d) {
+      isFilling = true;
+
+      const map = {
+        name: d.name,
+        phone: d.phone,
+        'tnm-email': d.email,
+        pincode: d.pincode,
+        city: d.city,
+        'tnm-state': d.state,
+        address: d.address
+      };
+
+      for (const [k, v] of Object.entries(map)) {
+        fields[k].value = v || '';
+        fields[k].dispatchEvent(
+          new Event('change', { bubbles: true })
+        );
+      }
+
+      isFilling = false;
+    }
+
+    function nextLabel() {
+      for (let n = 1; n <= MAX; n++) {
+        if (!saved.some(x => x.label === `Address ${n}`)) {
+          return `Address ${n}`;
+        }
+      }
+      return `Address ${saved.length + 1}`;
+    }
+
+    function addNew() {
+      if (saved.length >= MAX) {
+        message('You have reached 10 saved addresses. Delete one to add another.');
+        return;
+      }
+
+      selectedId = null;
+      selectedSnapshot = '';
+      declined = false;
+
+      fill({
+        name: '',
+        phone: '',
+        email: '',
+        pincode: '',
+        city: '',
+        state: '',
+        address: ''
+      });
+
+      fields.pincode.dispatchEvent(
+        new Event('input', { bubbles: true })
+      );
+
+      welcome.hidden = true;
+      showingList = false;
+
+      message('Enter the details for your new address.');
+      render();
+      fields.name.focus();
+    }
+
+    function choose(id) {
+      const x = byId(id);
+      if (!x) return;
+
+      selectedId = x.id;
+      fill(x.details);
+      selectedSnapshot = snapshot(x.details);
+      declined = false;
+
+      welcome.hidden = true;
+      showingList = false;
+
+      message('Using “' + x.label + '”. You can edit the fields before ordering.');
+      render();
+    }
+
+    function renameInline(x, card) {
+      const editor = document.createElement('div');
+      const input = document.createElement('input');
+
+      input.className = 'tnm-ab-rename';
+      input.value = x.label;
+      input.maxLength = 24;
+      input.setAttribute('aria-label', 'Address label');
+
+      editor.append(input);
+
+      const actions = document.createElement('div');
+      actions.className = 'tnm-ab-buttons';
+
+      actions.append(
+        button('Save name', () => {
+          const value = input.value.trim().slice(0, 24);
+
+          if (!value) {
+            return message('Please enter a name for the address.');
+          }
+
+          const previous = x.label;
+          x.label = value;
+
+          if (!persist()) {
+            x.label = previous;
+            return;
+          }
+
+          render();
+          message('Address renamed.');
+        }, 'primary'),
+
+        button('Cancel', render)
+      );
+
+      editor.append(actions);
+      card.append(editor);
+
+      input.focus();
+      input.select();
+    }
+
+    function deleteInline(x, card) {
+      const confirmArea = document.createElement('div');
+      confirmArea.className = 'tnm-ab-buttons';
+
+      confirmArea.append(
+        button('Confirm delete', () => {
+          const previous = saved;
+
+          saved = saved.filter(a => a.id !== x.id);
+
+          if (!persist()) {
+            saved = previous;
+            return;
+          }
+
+          if (selectedId === x.id) {
+            selectedId = null;
+            selectedSnapshot = '';
+          }
+
+          message('Saved address removed from this browser.');
+          render();
+        }, 'danger'),
+
+        button('Cancel', render)
+      );
+
+      card.append(confirmArea);
+    }
+
+    function renderList() {
+      list.replaceChildren();
+
+      if (!saved.length) {
+        const empty = document.createElement('p');
+        empty.className = 'tnm-ab-description';
+        empty.textContent =
+          'No addresses saved yet. Fill in your details and choose “Yes, save details”.';
+
+        list.append(empty);
+      }
+
+      saved.forEach(x => {
+        const card = document.createElement('article');
+
+        card.className =
+          'tnm-ab-card' + (selectedId === x.id ? ' selected' : '');
+
+        const title = document.createElement('div');
+        title.className = 'tnm-ab-title';
+
+        const name = document.createElement('span');
+        name.textContent = x.label;
+
+        title.append(name);
+
+        if (selectedId === x.id) {
+          const badge = document.createElement('span');
+
+          badge.className = 'tnm-ab-selected';
+          badge.textContent = '✓ Selected';
+
+          title.append(badge);
+        }
+
+        const detail = document.createElement('div');
+        detail.className = 'tnm-ab-details';
+
+        const d = x.details;
+
+        detail.textContent =
+          `${d.name} • +91 ${d.phone}\n` +
+          `${d.address}\n` +
+          `${d.city}, ${d.state} – ${d.pincode}\n` +
+          `${d.email}`;
+
+        const actions = document.createElement('div');
+        actions.className = 'tnm-ab-buttons';
+
+        actions.append(
+          button('Use this address', () => choose(x.id), 'primary'),
+          button('Rename', () => renameInline(x, card)),
+          button('Delete', () => deleteInline(x, card), 'danger')
+        );
+
+        card.append(title, detail, actions);
+        list.append(card);
+      });
+    }
+
+    function render() {
+      count.textContent = `(${saved.length}/${MAX})`;
+
+      welcome.hidden = !saved.length || welcome.hidden;
+
+      choices.hidden = !showingList;
+
+      toggle.textContent = showingList
+        ? 'Hide addresses'
+        : 'View addresses';
+
+      $('tnm-ab-new').disabled = saved.length >= MAX;
+
+      renderList();
+
+      const d = getDetails();
+
+      const changed =
+        selectedId && selectedSnapshot !== snapshot(d);
+
+      const needsPrompt =
+        !declined &&
+        valid(d) &&
+        (
+          (selectedId && changed) ||
+          (!selectedId && saved.length < MAX)
+        );
+
+      prompt.hidden = !needsPrompt;
+
+      if (selectedId && changed) {
+        question.textContent =
+          'Save your changes to this address?';
+
+        saveBtn.textContent = 'Yes, update address';
+      } else {
+        question.textContent =
+          'Would you like to save these details for next time?';
+
+        saveBtn.textContent = 'Yes, save details';
+      }
+    }
+
+    welcome
+      .querySelector('[data-welcome="yes"]')
+      .addEventListener('click', () => {
+        showingList = true;
+        welcome.hidden = true;
+
+        render();
+
+        panel.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest'
+        });
+      });
+
+    welcome
+      .querySelector('[data-welcome="no"]')
+      .addEventListener('click', () => {
+        welcome.hidden = true;
+        showingList = false;
+        render();
+      });
+
+    toggle.addEventListener('click', () => {
+      showingList = !showingList;
+      render();
+    });
+
+    $('tnm-ab-new').addEventListener('click', addNew);
+
+    $('tnm-ab-no').addEventListener('click', () => {
+      declined = true;
+      message('No problem — your details will not be saved.');
+      render();
+    });
+
+    saveBtn.addEventListener('click', () => {
+      const d = getDetails();
+
+      if (!valid(d)) {
+        return message(
+          'Complete all delivery details correctly before saving.'
+        );
+      }
+
+      if (!storageOK) {
+        return message(
+          'Browser storage is unavailable, so addresses cannot be saved.'
+        );
+      }
+
+      if (selectedId && byId(selectedId)) {
+        const x = byId(selectedId);
+        const previous = x.details;
+
+        x.details = d;
+
+        if (!persist()) {
+          x.details = previous;
+          return;
+        }
+
+        selectedSnapshot = snapshot(d);
+        message('Changes saved on this browser.');
+      } else {
+        if (saved.length >= MAX) {
+          return message(
+            '10-address limit reached. Delete one first.'
+          );
+        }
+
+        const x = {
+          id: crypto.randomUUID(),
+          label: nextLabel(),
+          details: d
+        };
+
+        saved.push(x);
+
+        if (!persist()) {
+          saved.pop();
+          return;
+        }
+
+        selectedId = x.id;
+        selectedSnapshot = snapshot(d);
+
+        message(
+          '✓ Address saved! You can use it next time you checkout.'
+        );
+      }
+
+      render();
+    });
+
+    keys.forEach(k => {
+      fields[k].addEventListener('input', () => {
+        if (!isFilling) render();
+      });
+
+      fields[k].addEventListener('change', () => {
+        if (!isFilling) render();
+      });
+    });
+
+    window.addEventListener('storage', e => {
+      if (e.key === STORAGE_KEY) {
+        saved = load();
+        render();
+      }
+    });
+
+    render();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, {
+      once: true
+    });
+  } else {
+    start();
+  }
+})();
+
