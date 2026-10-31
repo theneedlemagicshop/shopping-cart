@@ -3444,3 +3444,457 @@ const ENABLE_DATABASE_COD = true;
     }
 })();
 
+
+/* =====================================================
+   THE NEEDLE MAGIC SHOP - LIVE RAZORPAY CHECKOUT
+
+   LAUNCH SWITCH: OFF
+   Do not turn on until all final checks are complete.
+
+   Existing COD and Razorpay TEST code remain unchanged.
+===================================================== */
+
+(function () {
+
+    // IMPORTANT: KEEP FALSE UNTIL WE ARE READY TO LAUNCH.
+    const ENABLE_LIVE_RAZORPAY = false;
+
+    if (!ENABLE_LIVE_RAZORPAY) return;
+
+    const API =
+        "https://qpdmdtlegfidmemffqww.supabase.co/functions/v1/";
+
+    const PUBLIC_KEY =
+        "sb_publishable_KZ7glLv-_8XOI2vczTS-zQ_1GlZFjOb";
+
+    const STORAGE_KEY = "tnm-razorpay-live-pending-v1";
+
+    const originalPlaceOrder = placeOrder;
+    const originalCheckout = checkout;
+
+    let busy = false;
+
+    const read = id =>
+        document.getElementById(id)?.value.trim() || "";
+
+    const paymentMethod = () =>
+        document.querySelector(
+            'input[name="tnm-payment"]:checked'
+        )?.value || "online";
+
+    function mainButton() {
+        return document.querySelector(
+            '#checkout-modal button[onclick*="placeOrder"]'
+        );
+    }
+
+    function updateButton() {
+        if (busy) return;
+
+        const button = mainButton();
+        if (!button) return;
+
+        if (paymentMethod() === "online") {
+            button.textContent = "Pay Securely Online";
+        }
+    }
+
+    function setBusy(value) {
+        busy = value;
+
+        const button = mainButton();
+
+        if (button) {
+            button.disabled = value;
+
+            if (value) {
+                button.textContent =
+                    "Processing secure payment...";
+            } else {
+                updateButton();
+            }
+        }
+    }
+
+    function resetTurnstile() {
+        try {
+            window.turnstile?.reset();
+        } catch (error) {
+            console.warn("Turnstile reset:", error);
+        }
+    }
+
+    function loadRazorpay() {
+        if (window.Razorpay) {
+            return Promise.resolve();
+        }
+
+        return new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+
+            script.src =
+                "https://checkout.razorpay.com/v1/checkout.js";
+
+            script.onload = () => {
+                if (window.Razorpay) {
+                    resolve();
+                } else {
+                    reject(new Error(
+                        "Razorpay checkout could not load."
+                    ));
+                }
+            };
+
+            script.onerror = () => reject(
+                new Error("Unable to load payment gateway.")
+            );
+
+            document.head.appendChild(script);
+        });
+    }
+
+    async function callBackend(functionName, payload) {
+        const response = await fetch(API + functionName, {
+            method: "POST",
+            headers: {
+                "apikey": PUBLIC_KEY,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json()
+            .catch(() => ({}));
+
+        if (!response.ok) {
+            throw new Error(
+                data.error ||
+                "Payment service error (" +
+                response.status + ")"
+            );
+        }
+
+        return data;
+    }
+
+    function getPendingCheckout(customer, items) {
+        const fingerprint = JSON.stringify({
+            customer,
+            items
+        });
+
+        let pending = null;
+
+        try {
+            pending = JSON.parse(
+                sessionStorage.getItem(STORAGE_KEY) ||
+                "null"
+            );
+        } catch {
+            pending = null;
+        }
+
+        if (
+            !pending ||
+            pending.fingerprint !== fingerprint
+        ) {
+            pending = {
+                id: crypto.randomUUID(),
+                fingerprint
+            };
+
+            sessionStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(pending)
+            );
+        }
+
+        return pending;
+    }
+
+    async function startLivePayment() {
+
+        if (busy) return;
+
+        if (paymentMethod() !== "online") {
+            return;
+        }
+
+        if (!cart.length) {
+            alert("Your cart is empty.");
+            return;
+        }
+
+        const customer = {
+            name: read("name"),
+            email: read("tnm-email"),
+            phone: read("phone"),
+            address: read("address"),
+            city: read("city"),
+            state: read("tnm-state"),
+            pincode: read("pincode")
+        };
+
+        if (
+            customer.name.length < 2 ||
+            customer.address.length < 8 ||
+            customer.city.length < 2 ||
+            customer.state.length < 2 ||
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+                customer.email
+            ) ||
+            !/^[6-9]\d{9}$/.test(customer.phone) ||
+            !/^\d{6}$/.test(customer.pincode)
+        ) {
+            alert(
+                "Please complete all delivery details correctly."
+            );
+            return;
+        }
+
+        const turnstileToken =
+            window.turnstile?.getResponse() || "";
+
+        if (!turnstileToken) {
+            alert(
+                "Please complete Cloudflare verification."
+            );
+            return;
+        }
+
+        const items = cart.map(item => ({
+            id: Number(item.id),
+            quantity: Number(item.quantity)
+        }));
+
+        const pending =
+            getPendingCheckout(customer, items);
+
+        setBusy(true);
+
+        try {
+
+            await loadRazorpay();
+
+            // Create a LIVE order on our secure server.
+            // Product prices and discounts are
+            // recalculated by Supabase.
+            const order = await callBackend(
+                "tnm-razorpay-live-create-order",
+                {
+                    customer,
+                    items,
+                    turnstileToken,
+                    checkoutRequestId: pending.id
+                }
+            );
+
+            if (
+                order.success !== true ||
+                !String(order.keyId || "")
+                    .startsWith("rzp_live_") ||
+                !/^order_[a-zA-Z0-9]+$/.test(
+                    order.razorpayOrderId || ""
+                ) ||
+                !Number.isSafeInteger(order.amount) ||
+                order.amount <= 0 ||
+                order.checkoutRequestId !== pending.id
+            ) {
+                throw new Error(
+                    "Invalid live checkout response."
+                );
+            }
+
+            const options = {
+
+                key: order.keyId,
+                amount: order.amount,
+                currency: "INR",
+
+                name: "The Needle Magic Shop",
+                description: "Secure Online Payment",
+
+                order_id: order.razorpayOrderId,
+
+                prefill: {
+                    name: customer.name,
+                    email: customer.email,
+                    contact: customer.phone
+                },
+
+                theme: {
+                    color: "#203D4C"
+                },
+
+                handler: async function (payment) {
+
+                    // The checkout popup returning success
+                    // does NOT by itself confirm payment.
+                    // Our backend must verify it.
+
+                    try {
+
+                        const result = await callBackend(
+                            "tnm-razorpay-live-verify-payment",
+                            {
+                                checkoutRequestId: pending.id,
+                                razorpay_order_id:
+                                    payment.razorpay_order_id,
+                                razorpay_payment_id:
+                                    payment.razorpay_payment_id,
+                                razorpay_signature:
+                                    payment.razorpay_signature
+                            }
+                        );
+
+                        if (
+                            result.success === true &&
+                            result.paymentStatus === "paid" &&
+                            result.razorpayMode === "live" &&
+                            result.orderNumber != null
+                        ) {
+
+                            sessionStorage.removeItem(
+                                STORAGE_KEY
+                            );
+
+                            const orderNumber =
+                                result.orderNumber;
+
+                            const totalPaid =
+                                (Number(result.totalPaise) / 100)
+                                .toFixed(2);
+
+                            // Clear the cart only after
+                            // backend order confirmation.
+                            cart = [];
+                            updateCart();
+
+                            document.getElementById(
+                                "checkout-modal"
+                            ).style.display = "none";
+
+                            alert(
+                                "PAYMENT SUCCESSFUL!\n\n" +
+                                "Order #" + orderNumber +
+                                "\nAmount Paid: ₹" + totalPaid +
+                                "\n\nThank you for shopping with " +
+                                "The Needle Magic Shop!"
+                            );
+
+                        } else {
+
+                            alert(
+                                "Your payment is being confirmed.\n\n" +
+                                "Please do not pay again.\n" +
+                                "Contact the shop if you need help."
+                            );
+                        }
+
+                    } catch (error) {
+
+                        console.error(
+                            "Live payment verification:",
+                            error
+                        );
+
+                        alert(
+                            "We could not confirm your order yet.\n\n" +
+                            "Please DO NOT pay again.\n" +
+                            "Contact the shop with your " +
+                            "payment details."
+                        );
+
+                    } finally {
+                        resetTurnstile();
+                        setBusy(false);
+                    }
+                },
+
+                modal: {
+                    ondismiss: function () {
+                        resetTurnstile();
+                        setBusy(false);
+                    }
+                }
+            };
+
+            const razorpay = new window.Razorpay(options);
+
+            razorpay.on(
+                "payment.failed",
+                function (response) {
+                    console.warn(
+                        "Payment attempt failed:",
+                        response.error?.description
+                    );
+
+                    // Do not clear the cart.
+                    // Do not generate a new checkout ID.
+                }
+            );
+
+            razorpay.open();
+
+        } catch (error) {
+
+            console.error(
+                "Live Razorpay checkout error:",
+                error
+            );
+
+            alert(
+                "Unable to start secure payment:\n" +
+                error.message +
+                "\n\nIf you already attempted payment, " +
+                "check its status before trying again."
+            );
+
+            resetTurnstile();
+            setBusy(false);
+        }
+    }
+
+    // Keep the original COD handler untouched.
+    // Preserve the separate Razorpay TEST page.
+    placeOrder = function (...args) {
+
+        if (
+            paymentMethod() !== "online" ||
+            new URLSearchParams(
+                window.location.search
+            ).get("razorpay-test") === "1"
+        ) {
+            return originalPlaceOrder.apply(
+                this,
+                args
+            );
+        }
+
+        return startLivePayment();
+    };
+
+    checkout = function (...args) {
+        const result = originalCheckout.apply(
+            this,
+            args
+        );
+
+        updateButton();
+
+        return result;
+    };
+
+    document.querySelectorAll(
+        'input[name="tnm-payment"]'
+    ).forEach(radio => {
+        radio.addEventListener(
+            "change",
+            updateButton
+        );
+    });
+
+    updateButton();
+
+})();
+
