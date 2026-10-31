@@ -4457,39 +4457,36 @@ body:has(#checkout-modal[style*="display: flex"]) #floating-cart {
 }
 
 
-/* =====================================================
-   THE NEEDLE MAGIC SHOP
-   MOBILE SCREEN + BUTTON OVERLAP FIX
-   ===================================================== */
+/* ===============================================
+   TNM — FINAL MOBILE CART & CHECKOUT FIX
+   =============================================== */
 
-/* Keep the cart within the actual visible screen */
+/* Keep cart inside the visible browser screen */
 #cart-drawer {
     height: 100vh !important;
     height: 100dvh !important;
     max-height: 100dvh !important;
-
     display: flex !important;
     flex-direction: column !important;
     overflow: hidden !important;
-
     box-sizing: border-box !important;
 }
 
-/* Cart header stays visible */
+/* Header remains accessible */
 #cart-drawer .cart-drawer-header {
     flex: 0 0 auto;
 }
 
-/* Rewards must not push checkout off-screen */
-#cart-drawer #tnm-rewards,
-#cart-drawer .tnm-cart-rewards {
+/* Rewards can shrink on short screens */
+#cart-drawer #tnm-rewards {
     flex: 0 1 auto;
     min-height: 0;
+    max-height: 30%;
     overflow-y: auto;
     overscroll-behavior: contain;
 }
 
-/* Product list scrolls properly */
+/* Products scroll without moving checkout off-screen */
 #cart-drawer #cart-drawer-items {
     flex: 1 1 auto !important;
     min-height: 0 !important;
@@ -4499,69 +4496,62 @@ body:has(#checkout-modal[style*="display: flex"]) #floating-cart {
     touch-action: pan-y;
 }
 
-/* Footer always stays inside the visible cart */
+/* Footer never extends below the visible screen */
 #cart-drawer .cart-drawer-footer {
-    flex: 0 1 auto !important;
-
-    max-height: 48%;
-    min-height: 0;
-
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 0 0 auto !important;
+    min-height: 0 !important;
+    max-height: min(55dvh, 360px);
+    overflow: hidden !important;
     box-sizing: border-box !important;
-
     padding-bottom: max(
-        24px,
-        calc(18px + env(safe-area-inset-bottom, 0px))
+        18px,
+        calc(12px + env(safe-area-inset-bottom, 0px))
     ) !important;
 }
 
-/* Checkout button stays usable */
+/* Summary scrolls if phone height is very small */
+#cart-drawer .tnm-drawer-summary {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Total and checkout button remain visible */
+#cart-drawer .cart-drawer-total,
+#cart-drawer .drawer-checkout-btn {
+    flex: 0 0 auto !important;
+}
+
 #cart-drawer .drawer-checkout-btn {
     position: relative;
     width: 100%;
     min-height: 48px;
-    flex-shrink: 0;
-    box-sizing: border-box;
+    margin: 0 !important;
 }
 
-/* Prevent floating buttons from covering modals */
-#scrollTopBtn {
-    z-index: 9000 !important;
-    bottom: calc(
-        22px + env(safe-area-inset-bottom, 0px)
-    ) !important;
-}
-
-/* Remove the duplicate legacy back-to-top button */
-#back-to-top {
-    display: none !important;
-}
-
-/* Floating cart stays underneath all modal windows */
-#floating-cart {
-    z-index: 9000 !important;
-}
-
-/* Checkout modal respects actual mobile screen height */
+/* Checkout modal scrolls within the screen */
 #checkout-modal {
+    height: 100vh !important;
+    height: 100dvh !important;
     max-height: 100dvh !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
-
     overscroll-behavior: contain;
-    box-sizing: border-box;
-
-    padding-bottom: calc(
-        24px + env(safe-area-inset-bottom, 0px)
-    );
+    box-sizing: border-box !important;
+    padding: 0 12px calc(
+        20px + env(safe-area-inset-bottom, 0px)
+    ) !important;
 }
 
-/* Keep the bottom of checkout accessible */
 #checkout-form {
-    box-sizing: border-box;
+    box-sizing: border-box !important;
+    width: min(100%, 520px) !important;
+    max-width: 100% !important;
+    margin: 16px auto !important;
+    padding: clamp(14px, 4vw, 25px) !important;
 }
 
 #place-order-btn {
@@ -4569,7 +4559,35 @@ body:has(#checkout-modal[style*="display: flex"]) #floating-cart {
     margin-bottom: 12px;
 }
 
-/* Smaller phones and browser windows */
+/* Remove legacy arrow */
+#back-to-top {
+    display: none !important;
+}
+
+/* Floating controls sit behind modal windows */
+#scrollTopBtn,
+#floating-cart {
+    z-index: 9000 !important;
+}
+
+/* Hide floating controls while cart is open */
+body:has(#cart-drawer.open) #scrollTopBtn,
+body:has(#cart-drawer.open) #floating-cart,
+
+/* Hide while checkout is open */
+body:has(#checkout-modal[style*="display: block"]) #scrollTopBtn,
+body:has(#checkout-modal[style*="display: block"]) #floating-cart,
+
+/* Hide while product and other popups are open */
+body:has(#quick-view-modal[style*="display: flex"]) #scrollTopBtn,
+body:has(#youtube-modal[style*="display: flex"]) #scrollTopBtn,
+body:has(#image-modal[style*="display: flex"]) #scrollTopBtn,
+body:has(#tnm-confirmation-overlay:not([hidden])) #scrollTopBtn {
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Small phones */
 @media (max-width: 600px) {
     #cart-drawer {
         width: 100% !important;
@@ -4577,24 +4595,12 @@ body:has(#checkout-modal[style*="display: flex"]) #floating-cart {
     }
 
     #cart-drawer .cart-drawer-header {
-        padding: 14px 16px;
+        padding: 12px 16px !important;
     }
 
     #cart-drawer .cart-drawer-footer {
         padding-left: 16px !important;
         padding-right: 16px !important;
-    }
-}
-
-/* Particularly short phone screens */
-@media (max-height: 650px) {
-    #cart-drawer .cart-drawer-header {
-        padding-top: 10px;
-        padding-bottom: 10px;
-    }
-
-    #cart-drawer .cart-drawer-footer {
-        max-height: 55%;
     }
 }
 

@@ -3005,35 +3005,40 @@ const ENABLE_DATABASE_COD = true;
                 result
             );
 
-            const amount = (
-                Number(result.totalPaise) / 100
-            ).toFixed(2);
+            
+const amount = (
+    Number(result.totalPaise) / 100
+).toFixed(2);
 
-            alert(
-                (testMode ? "TEST ORDER " : "ORDER ") +
-                (result.alreadyExists
-                    ? "ALREADY RECORDED"
-                    : "PLACED SUCCESSFULLY") +
-                "\nOrder #" + result.orderNumber +
-                "\nTotal: ₹" + amount +
-                "\nPayment: Cash on Delivery" +
-                (testMode
-                    ? "\nThis is only a database test."
-                    : "")
-            );
+if (testMode) {
 
-            if (!testMode) {
-                localStorage.removeItem(storageKey);
+    alert(
+        "TEST COD ORDER SAVED!\n\n" +
+        "Order #" + result.orderNumber +
+        "\nTotal: ₹" + amount +
+        "\nThis is only a database test."
+    );
 
-                cart = [];
-                updateCart();
+} else {
 
-                document.getElementById(
-                    "checkout-modal"
-                ).style.display = "none";
-            }
+    // Clear pending ID only after the server succeeds.
+    localStorage.removeItem(storageKey);
 
-            return result;
+    cart = [];
+    updateCart();
+
+    document.getElementById(
+        "checkout-modal"
+    ).style.display = "none";
+
+    // Show branded confirmation.
+    window.tnmShowOrderConfirmation({
+        orderNumber: result.orderNumber,
+        totalPaise: result.totalPaise,
+        paymentMethod: "cod"
+    });
+}
+
 
         } catch (error) {
             console.error(
@@ -3809,13 +3814,12 @@ function updateButton() {
                                 "checkout-modal"
                             ).style.display = "none";
 
-                            alert(
-                                "PAYMENT SUCCESSFUL!\n\n" +
-                                "Order #" + orderNumber +
-                                "\nAmount Paid: ₹" + totalPaid +
-                                "\n\nThank you for shopping with " +
-                                "The Needle Magic Shop!"
-                            );
+                            
+window.tnmShowOrderConfirmation({
+    orderNumber: orderNumber,
+    totalPaise: result.totalPaise,
+    paymentMethod: "online"
+});
 
                         } else {
 
@@ -3937,6 +3941,242 @@ alert(
 
     updateButton();
 
+})();
+
+
+/* ===============================================
+   TNM — ORDER CONFIRMATION POPUP
+   Insert BEFORE AFTER-ORDER CUSTOMER TOOLS
+   =============================================== */
+
+(function () {
+  if (typeof window.tnmShowOrderConfirmation === "function") return;
+
+  const style = document.createElement("style");
+
+  style.textContent = `
+    #tnm-confirmation-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 11050;
+      background: rgba(17, 35, 45, .67);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    #tnm-confirmation-overlay[hidden] {
+      display: none !important;
+    }
+
+    #tnm-confirmation-card {
+      width: 100%;
+      max-width: 440px;
+      max-height: calc(100dvh - 32px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      background: white;
+      color: #203D4C;
+      border-radius: 18px;
+      padding: 24px;
+      box-sizing: border-box;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+
+    #tnm-confirmation-card h2 {
+      font-size: 23px;
+      margin: 9px 0 5px;
+    }
+
+    #tnm-confirmation-card p {
+      line-height: 1.55;
+    }
+
+    .tnm-confirm-check {
+      display: inline-grid;
+      place-items: center;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #e2f6ea;
+      color: #188249;
+      font-size: 36px;
+    }
+
+    .tnm-confirm-ref {
+      background: #f3f7f8;
+      border-radius: 12px;
+      padding: 14px 10px;
+      margin: 18px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .tnm-confirm-ref strong {
+      display: block;
+      font-size: 19px;
+      margin-top: 5px;
+    }
+
+    #tnm-confirm-continue {
+      width: 100%;
+      min-height: 48px;
+      margin: 0;
+      border: none;
+      border-radius: 11px;
+      background: #203D4C;
+      color: white;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  `;
+
+  document.head.appendChild(style);
+
+  const overlay = document.createElement("div");
+  overlay.id = "tnm-confirmation-overlay";
+  overlay.hidden = true;
+
+  overlay.innerHTML = `
+    <section
+      id="tnm-confirmation-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tnm-confirm-title"
+      tabindex="-1"
+    >
+      <span class="tnm-confirm-check" aria-hidden="true">✓</span>
+
+      <h2 id="tnm-confirm-title">
+        Thank You for Your Order!
+      </h2>
+
+      <p>Your order has been confirmed.</p>
+
+      <div class="tnm-confirm-ref">
+        Order Reference
+        <strong id="tnm-confirm-order-number"></strong>
+      </div>
+
+      <p id="tnm-confirm-payment"></p>
+      <p id="tnm-confirm-total"></p>
+
+      <p>🚚 Free Shipping</p>
+
+      <button type="button" id="tnm-confirm-continue">
+        Continue Shopping
+      </button>
+    </section>
+  `;
+
+  document.body.appendChild(overlay);
+
+  const continueButton =
+    document.getElementById("tnm-confirm-continue");
+
+  const dialog =
+    document.getElementById("tnm-confirmation-card");
+
+  let previousFocus = null;
+  let previousOverflow = "";
+
+  function closeConfirmation() {
+    overlay.hidden = true;
+    document.body.style.overflow = previousOverflow;
+
+    if (previousFocus && previousFocus.isConnected) {
+      previousFocus.focus();
+    }
+  }
+
+  continueButton.addEventListener(
+    "click",
+    closeConfirmation
+  );
+
+  overlay.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeConfirmation();
+    }
+
+    if (event.key !== "Tab") return;
+
+    const focusables = [
+      ...dialog.querySelectorAll("button, a[href]")
+    ].filter(el =>
+      !el.hidden && el.getClientRects().length
+    );
+
+    if (!focusables.length) return;
+
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+
+    if (
+      event.shiftKey &&
+      document.activeElement === first
+    ) {
+      event.preventDefault();
+      last.focus();
+    } else if (
+      !event.shiftKey &&
+      document.activeElement === last
+    ) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  window.tnmShowOrderConfirmation = function (details = {}) {
+    if (details.orderNumber == null) return;
+
+    const number = String(details.orderNumber).trim();
+
+    const reference = /^TNM/i.test(number)
+      ? number
+      : "TNM26X-" + number.padStart(4, "0");
+
+    const amount = Number(details.totalPaise);
+    const isCOD = details.paymentMethod === "cod";
+
+    document.getElementById(
+      "tnm-confirm-order-number"
+    ).textContent = reference;
+
+    document.getElementById(
+      "tnm-confirm-payment"
+    ).textContent = isCOD
+      ? "Cash on Delivery — Confirmed (Pay on Delivery)"
+      : "Online Payment — Received";
+
+    document.getElementById(
+      "tnm-confirm-total"
+    ).textContent =
+      (isCOD ? "Amount Due: " : "Amount Paid: ") +
+      (Number.isFinite(amount)
+        ? "₹" + (amount / 100).toFixed(2)
+        : "See order details");
+
+    previousFocus = document.activeElement;
+    previousOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    overlay.hidden = false;
+
+    continueButton.focus();
+
+    if (typeof window.confetti === "function") {
+      window.confetti({
+        particleCount: 100,
+        spread: 75,
+        origin: { y: 0.55 }
+      });
+    }
+  };
 })();
 
 
@@ -4247,6 +4487,25 @@ alert(
             stateAutoFilled = false;
         }
     });
+
+    
+    // Cancel old PIN lookups when a saved address is selected.
+    window.addEventListener("tnm:address-loaded", function () {
+        clearTimeout(lookupTimer);
+
+        if (controller) {
+            controller.abort();
+            controller = null;
+        }
+
+        cityAutoFilled = false;
+        stateAutoFilled = false;
+        cityManuallyEdited = false;
+        stateManuallyEdited = false;
+
+        status.textContent = "";
+    });
+
 
     pinInput.addEventListener("input", function () {
 
@@ -4722,14 +4981,23 @@ alert(
         address: d.address
       };
 
+      
       for (const [k, v] of Object.entries(map)) {
         fields[k].value = v || '';
+
         fields[k].dispatchEvent(
           new Event('change', { bubbles: true })
         );
       }
 
+      // Inform PIN auto-fill that these values
+      // came from the saved-address system.
+      window.dispatchEvent(
+        new Event('tnm:address-loaded')
+      );
+
       isFilling = false;
+
     }
 
     function nextLabel() {
