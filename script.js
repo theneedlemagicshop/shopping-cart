@@ -3939,3 +3939,256 @@ alert(
 
 })();
 
+
+/* =====================================================
+   THE NEEDLE MAGIC SHOP
+   AFTER-ORDER CUSTOMER TOOLS
+
+   - Copy branded order reference
+   - Contact shop on WhatsApp
+   - Save order reference reminder
+
+   Works with COD and verified Razorpay orders.
+   Does not change payments or order processing.
+===================================================== */
+
+(function () {
+
+    const overlay = document.getElementById(
+        "tnm-confirmation-overlay"
+    );
+
+    const continueButton = document.getElementById(
+        "tnm-confirm-continue"
+    );
+
+    if (
+        !overlay ||
+        !continueButton ||
+        typeof window.tnmShowOrderConfirmation !== "function"
+    ) {
+        console.warn(
+            "Order confirmation tools could not initialize."
+        );
+        return;
+    }
+
+    // Prevent duplicate controls.
+    if (document.getElementById("tnm-order-tools")) {
+        return;
+    }
+
+    const style = document.createElement("style");
+
+    style.textContent = `
+        #tnm-order-tools {
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+            margin: 0 0 20px;
+            text-align: center;
+        }
+
+        #tnm-order-tools-note {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #64757D;
+            margin: 0 0 6px;
+        }
+
+        #tnm-copy-reference,
+        #tnm-order-whatsapp {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 48px;
+            padding: 13px 15px;
+            box-sizing: border-box;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background .2s ease;
+        }
+
+        #tnm-copy-reference {
+            background: #F4F8F9;
+            color: #203D4C;
+            border: 1.5px solid #CAD9DE;
+        }
+
+        #tnm-copy-reference:hover {
+            background: #E6F0F3;
+        }
+
+        #tnm-order-whatsapp {
+            background: #E7F7ED;
+            border: 1.5px solid #BCE5CB;
+            color: #176B3C;
+        }
+
+        #tnm-order-whatsapp:hover {
+            background: #D7F0E0;
+        }
+
+        #tnm-copy-reference:focus-visible,
+        #tnm-order-whatsapp:focus-visible {
+            outline: 3px solid #62A8CB;
+            outline-offset: 3px;
+        }
+
+        #tnm-copy-status {
+            font-size: 12px;
+            color: #176B3C;
+            min-height: 16px;
+        }
+    `;
+
+    document.head.appendChild(style);
+
+    const tools = document.createElement("div");
+    tools.id = "tnm-order-tools";
+
+    tools.innerHTML = `
+        <p id="tnm-order-tools-note">
+            Please save your order reference.
+            You'll need it if you contact us
+            about your purchase.
+        </p>
+
+        <button
+            type="button"
+            id="tnm-copy-reference"
+        >
+            📋 Copy Order Reference
+        </button>
+
+        <span
+            id="tnm-copy-status"
+            role="status"
+            aria-live="polite"
+        ></span>
+
+        <a
+            id="tnm-order-whatsapp"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            💬 Get Order Help on WhatsApp
+        </a>
+    `;
+
+    // Insert both tools above Continue Shopping.
+    continueButton.parentNode.insertBefore(
+        tools,
+        continueButton
+    );
+
+    const copyButton = document.getElementById(
+        "tnm-copy-reference"
+    );
+
+    const copyStatus = document.getElementById(
+        "tnm-copy-status"
+    );
+
+    const whatsappButton = document.getElementById(
+        "tnm-order-whatsapp"
+    );
+
+    const referenceElement = document.getElementById(
+        "tnm-confirm-order-number"
+    );
+
+    // Reuse the WhatsApp support link already
+    // published in the website footer.
+    const existingSupportLink = document.querySelector(
+        ".tnm-contact-link[href*='wa.me/']"
+    );
+
+    const supportURL = existingSupportLink
+        ? existingSupportLink.href
+        : null;
+
+    function getOrderReference() {
+        return referenceElement?.textContent.trim() || "";
+    }
+
+    function updateWhatsAppLink() {
+        const reference = getOrderReference();
+
+        if (!supportURL || !reference) {
+            whatsappButton.hidden = true;
+            return;
+        }
+
+        const url = new URL(supportURL);
+
+        url.searchParams.set(
+            "text",
+            "Hello The Needle Magic Shop! " +
+            "I need help with my order.\n\n" +
+            "Order Reference: " + reference +
+            "\n\nPlease help me with an update."
+        );
+
+        whatsappButton.href = url.toString();
+        whatsappButton.hidden = false;
+    }
+
+    copyButton.addEventListener(
+        "click",
+        async function () {
+
+            const reference = getOrderReference();
+
+            if (!reference) {
+                copyStatus.textContent =
+                    "Order reference unavailable.";
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(
+                    reference
+                );
+
+                copyStatus.textContent =
+                    "✓ Order reference copied!";
+
+            } catch {
+                // Manual fallback for browsers that
+                // restrict clipboard access.
+                window.prompt(
+                    "Copy your order reference:",
+                    reference
+                );
+            }
+        }
+    );
+
+    // Extend, rather than replace, the existing
+    // order confirmation behaviour.
+    const originalConfirmation =
+        window.tnmShowOrderConfirmation;
+
+    window.tnmShowOrderConfirmation = function (
+        details
+    ) {
+        const result = originalConfirmation.call(
+            this,
+            details
+        );
+
+        copyStatus.textContent = "";
+        updateWhatsAppLink();
+
+        return result;
+    };
+
+})();
+
