@@ -4192,3 +4192,200 @@ alert(
 
 })();
 
+ 
+/* =====================================================
+   THE NEEDLE MAGIC SHOP
+   AUTOMATIC CITY & STATE FROM PIN CODE
+
+   - Free Indian PIN code lookup
+   - Both fields remain editable
+   - Does not overwrite manual corrections
+   - Safe if the lookup service is unavailable
+===================================================== */
+
+(function () {
+
+    const pinInput = document.getElementById("pincode");
+    const cityInput = document.getElementById("city");
+    const stateInput = document.getElementById("tnm-state");
+
+    if (!pinInput || !cityInput || !stateInput) return;
+
+    let lookupTimer = null;
+    let controller = null;
+
+    let cityAutoFilled = false;
+    let stateAutoFilled = false;
+
+    let cityManuallyEdited = false;
+    let stateManuallyEdited = false;
+
+    // Display a small message below PIN Code.
+    const status = document.createElement("div");
+
+    status.style.cssText = `
+        font-size: 12px;
+        margin: 6px 0 12px;
+        color: #64757D;
+        line-height: 1.5;
+    `;
+
+    status.setAttribute("aria-live", "polite");
+    pinInput.insertAdjacentElement("afterend", status);
+
+    // Protect manual corrections.
+    cityInput.addEventListener("input", function (event) {
+        if (event.isTrusted) {
+            cityManuallyEdited = true;
+            cityAutoFilled = false;
+        }
+    });
+
+    stateInput.addEventListener("input", function (event) {
+        if (event.isTrusted) {
+            stateManuallyEdited = true;
+            stateAutoFilled = false;
+        }
+    });
+
+    pinInput.addEventListener("input", function () {
+
+        clearTimeout(lookupTimer);
+
+        if (controller) {
+            controller.abort();
+            controller = null;
+        }
+
+        const pin = pinInput.value.trim();
+
+        // Remove old automatically generated values
+        // when the customer changes the PIN.
+        // Never remove values they manually edited.
+        if (cityAutoFilled && !cityManuallyEdited) {
+            cityInput.value = "";
+            cityAutoFilled = false;
+        }
+
+        if (stateAutoFilled && !stateManuallyEdited) {
+            stateInput.value = "";
+            stateAutoFilled = false;
+        }
+
+        status.textContent = "";
+
+        if (!/^\d{6}$/.test(pin)) {
+            return;
+        }
+
+        status.textContent = "Finding your city and state...";
+
+        // Small delay avoids unnecessary requests.
+        lookupTimer = setTimeout(async function () {
+
+            const requestedPin = pin;
+            const currentController = new AbortController();
+
+            controller = currentController;
+
+            try {
+
+                const response = await fetch(
+                    "https://api.postalpincode.in/pincode/" +
+                    encodeURIComponent(requestedPin),
+                    {
+                        signal: currentController.signal
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error("PIN lookup unavailable");
+                }
+
+                const results = await response.json();
+
+                // Ignore outdated responses.
+                if (pinInput.value.trim() !== requestedPin) {
+                    return;
+                }
+
+                const result = results?.[0];
+
+                if (
+                    result?.Status !== "Success" ||
+                    !Array.isArray(result.PostOffice) ||
+                    result.PostOffice.length === 0
+                ) {
+                    status.textContent =
+                        "PIN code not found. Please enter city and state manually.";
+                    return;
+                }
+
+                const postOffice = result.PostOffice[0];
+
+                // District is used as the suggested city.
+                const city = String(
+                    postOffice.District || ""
+                ).trim();
+
+                const state = String(
+                    postOffice.State || ""
+                ).trim();
+
+                if (
+                    city &&
+                    !cityManuallyEdited &&
+                    !cityInput.value.trim()
+                ) {
+                    cityInput.value = city;
+                    cityAutoFilled = true;
+
+                    cityInput.dispatchEvent(
+                        new Event("change", { bubbles: true })
+                    );
+                }
+
+                if (
+                    state &&
+                    !stateManuallyEdited &&
+                    !stateInput.value.trim()
+                ) {
+                    stateInput.value = state;
+                    stateAutoFilled = true;
+
+                    stateInput.dispatchEvent(
+                        new Event("change", { bubbles: true })
+                    );
+                }
+
+                status.textContent =
+                    "✓ Location found. You can edit city and state if needed.";
+
+                status.style.color = "#16834B";
+
+            } catch (error) {
+
+                if (error.name === "AbortError") return;
+
+                console.warn(
+                    "PIN lookup unavailable:",
+                    error.message
+                );
+
+                status.textContent =
+                    "Auto-fill unavailable. Please enter city and state manually.";
+
+                status.style.color = "#64757D";
+
+            } finally {
+                if (controller === currentController) {
+                    controller = null;
+                }
+            }
+
+        }, 450);
+
+    });
+
+})();
+
