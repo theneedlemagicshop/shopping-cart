@@ -3457,7 +3457,11 @@ const ENABLE_DATABASE_COD = true;
 (function () {
 
     // IMPORTANT: KEEP FALSE UNTIL WE ARE READY TO LAUNCH.
-    const ENABLE_LIVE_RAZORPAY = false;
+    
+const ENABLE_LIVE_RAZORPAY =
+    new URLSearchParams(window.location.search)
+        .get("razorpay-live-pilot") === "1";
+
 
     if (!ENABLE_LIVE_RAZORPAY) return;
 
