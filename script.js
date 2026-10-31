@@ -3488,16 +3488,40 @@ const ENABLE_DATABASE_COD = true;
         );
     }
 
-    function updateButton() {
-        if (busy) return;
 
-        const button = mainButton();
-        if (!button) return;
+function updateButton() {
+    if (busy) return;
 
-        if (paymentMethod() === "online") {
-            button.textContent = "Pay Securely Online";
+    const button = mainButton();
+    const method = paymentMethod();
+
+    // Preserve the existing COD button behaviour.
+    if (button && method === "online") {
+        button.textContent = "Pay Securely Online";
+    }
+
+    // Update the checkout notice only when
+    // the Live Razorpay integration is enabled.
+    const notice = document.getElementById(
+        "tnm-payment-notice"
+    );
+
+    if (notice) {
+        if (method === "online") {
+            notice.textContent =
+                "Pay securely using Razorpay. " +
+                "UPI, cards, netbanking and other " +
+                "available payment methods are supported. " +
+                "No extra payment fee.";
+        } else {
+            notice.textContent =
+                "Cash on Delivery is available " +
+                "with a ₹29 COD fee. " +
+                "Shipping is FREE.";
         }
     }
+}
+
 
     function setBusy(value) {
         busy = value;
