@@ -3827,12 +3827,18 @@ function updateButton() {
                             error
                         );
 
-                        alert(
-                            "We could not confirm your order yet.\n\n" +
-                            "Please DO NOT pay again.\n" +
-                            "Contact the shop with your " +
-                            "payment details."
-                        );
+                        
+alert(
+    "Your payment confirmation is pending.\n\n" +
+    "Please DO NOT pay again.\n\n" +
+    "Checkout Reference:\n" +
+    pending.id +
+    "\n\nRazorpay Payment ID:\n" +
+    (payment?.razorpay_payment_id || "Unavailable") +
+    "\n\nPlease contact The Needle Magic Shop " +
+    "with these details so we can check your order."
+);
+
 
                     } finally {
                         resetTurnstile();
