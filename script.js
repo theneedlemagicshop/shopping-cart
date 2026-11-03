@@ -1,6 +1,14 @@
 const products = [
 
 {
+    id: 80,
+    name: "Crochet Marigold Flower Door Hanging (1 Pair)",
+    categories: ["Home Decor","Flowers"],
+    price: 459 , // Cost price: ₹120 x 2 = 240 (390)
+    image: "images/image80.PNG"
+},
+
+{
     id: 79,
     name: "Crochet Lotus Diya Holder",
     categories: ["Home Decor","Flowers"],
@@ -635,6 +643,10 @@ const products = [
 ];
 
 const productVideos = {
+    
+    80: [
+        "https://youtu.be/d9HHZcYae48?si=DTVpjpOwSWdhPfyj"
+    ],
     
     79: [
         "https://youtu.be/byA2Le7ErqI?si=G58b-2Fa74xihlot"
