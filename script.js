@@ -1,6 +1,14 @@
 const products = [
 
 {
+    id: 81,
+    name: "Crochet Diya Applique (Set of 10)",
+    categories: ["Home Decor"],
+    price: 299 , // Cost price: ₹10 x 10 = 100 (250)
+    image: "images/image81.PNG"
+},
+
+{
     id: 80,
     name: "Crochet Marigold Flower Door Hanging (1 Pair)",
     categories: ["Home Decor","Flowers"],
@@ -643,6 +651,10 @@ const products = [
 ];
 
 const productVideos = {
+    
+    81: [
+        "https://youtu.be/8oYItpmynqw?si=tV_9JS_sNvNPgb2c"
+    ],
     
     80: [
         "https://youtu.be/d9HHZcYae48?si=DTVpjpOwSWdhPfyj"
