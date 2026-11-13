@@ -1,5 +1,32 @@
 const products = [
 
+
+{
+    id: 82,
+    name: "Crochet Mini Dress Keychain",
+    categories: ["Keychains"],
+    price: 199, // Cost price: ₹20 (170)
+    image: "images/image82.png",
+
+    variants: [
+        {
+            id: 82.1,
+            name: "Crochet Mini Dress Keychain - Light Pink",
+            image: "images/image82_1.png"
+        },
+        {
+            id: 82.2,
+            name: "Crochet Mini Dress Keychain - Yellow",
+            image: "images/image82_2.png"
+        },
+        {
+            id: 82.3,
+            name: "Crochet Mini Dress Keychain - Orange",
+            image: "images/image82_3.png"
+        }
+    ]
+},
+
 {
     id: 81,
     name: "Crochet Diya Applique (Set of 10)",
@@ -652,6 +679,11 @@ const products = [
 
 const productVideos = {
     
+
+    82: [
+        "https://youtu.be/E4ua3UJ485A?si=uY8_nE7lD4Eigc0v"
+    ],
+
     81: [
         "https://youtu.be/8oYItpmynqw?si=tV_9JS_sNvNPgb2c"
     ],
@@ -1016,6 +1048,47 @@ const productsDiv = document.getElementById("products");
 const cartItems = document.getElementById("cart-items");
 const total = document.getElementById("total");
 
+
+/* PRODUCT VARIANT LOOKUP */
+
+function tnmGetProduct(id) {
+    const numericId = Number(id);
+
+    const original = products.find(
+        p => p.id === numericId
+    );
+
+    if (original) return original;
+
+    for (const parent of products) {
+        const variant = (parent.variants || []).find(
+            v => v.id === numericId
+        );
+
+        if (variant) {
+            return {
+                ...parent,
+                id: variant.id,
+                parentId: parent.id,
+                name: variant.name || parent.name,
+                image: variant.image || parent.image,
+                price: parent.price,
+                categories: parent.categories,
+                variants: undefined
+            };
+        }
+    }
+
+    return null;
+}
+
+function tnmCartHasVariant() {
+    return cart.some(
+        item => tnmGetProduct(item.id)?.parentId != null
+    );
+}
+
+
 function displayProducts(list = products){
 
     productsDiv.innerHTML = "";
@@ -1054,13 +1127,17 @@ function displayProducts(list = products){
 
             </div>
 
-            <button onclick="addToCart(${product.id})">
-                Add to Cart
-            </button>
+            
+<button onclick="${product.variants?.length ? `openQuickView(${product.id})` : `addToCart(${product.id})`}">
+    Add to Cart
+</button>
 
-            <button class="buy-now" onclick="buyNow(${product.id})">
-                Buy Now
-            </button>
+
+            
+<button class="buy-now" onclick="${product.variants?.length ? `openQuickView(${product.id})` : `buyNow(${product.id})`}">
+    Buy Now
+</button>
+
 
             <button class="youtube-btn" onclick="openYouTube(${product.id})">
                 ▶ Video Tutorial
@@ -1078,8 +1155,11 @@ function addToCart(id) {
     if (existing) {
         existing.quantity++;
     } else {
-        const product = products.find(p => p.id === id);
-        cart.push({
+        
+const product = tnmGetProduct(id);
+if (!product) return;
+cart.push({
+
             ...product,
             quantity: 1
         });
@@ -2285,7 +2365,7 @@ function smoothScrollToTop() {
 
   function calculateTNM(method = "online") {
     const subtotal = cart.reduce((sum, item) => {
-      const product = products.find(p => p.id === item.id);
+      const product = tnmGetProduct(item.id);
       return sum + (product ? product.price * item.quantity : 0);
     }, 0);
     const gift = subtotal >= 299;
@@ -2316,7 +2396,7 @@ function updateTNMCheckout() {
 
     // Show all products in the order
     const productList = cart.map(item => {
-        const product = products.find(p => p.id === item.id);
+        const product = tnmGetProduct(item.id);
         if (!product) return "";
 
         const name = product.name
@@ -2465,7 +2545,7 @@ set("tnm-drawer-discount", "−" + rupees(t.discount));
     const method = document.querySelector('input[name="tnm-payment"]:checked')?.value || "online";
     const t = calculateTNM(method);
     const itemLines = cart.map(item => {
-      const product = products.find(p => p.id === item.id);
+      const product = tnmGetProduct(item.id);
       return product ? `${product.name.replace(/<br\s*\/?\s*>/gi, " ")} × ${item.quantity} — ${rupees(product.price * item.quantity)}` : "";
     }).filter(Boolean).join("\n");
     const lines = [
@@ -5379,5 +5459,166 @@ alert(
   } else {
     start();
   }
+})();
+
+
+/* PRODUCT VARIANT SELECTOR — QUICK VIEW ONLY */
+
+(function () {
+    const originalOpenQuickViewForVariants = openQuickView;
+
+    openQuickView = function (productId) {
+        originalOpenQuickViewForVariants(productId);
+
+        const parent = products.find(p => p.id === productId);
+        const details = document.querySelector(
+            "#quick-view-modal .quick-view-details"
+        );
+
+        if (!details) return;
+
+        // Remove any previous selector.
+        details.querySelector("#tnm-variant-picker")?.remove();
+
+        // Normal products do not need a selector.
+        if (!parent?.variants?.length) return;
+
+        const picker = document.createElement("div");
+        picker.id = "tnm-variant-picker";
+        picker.className = "tnm-variant-picker";
+
+        const label = document.createElement("label");
+        label.htmlFor = "tnm-variant-select";
+        label.textContent = "Choose a design";
+
+        const select = document.createElement("select");
+        select.id = "tnm-variant-select";
+
+        // Include the original product and all variants.
+        const entries = [parent, ...parent.variants];
+
+        entries.forEach((entry, index) => {
+            const option = document.createElement("option");
+
+            option.value = String(entry.id);
+
+            option.textContent = (
+                entry.name || parent.name
+            ).replace(/<br\s*\/?>/gi, " ") +
+                (index === 0 ? " (Original)" : "");
+
+            select.appendChild(option);
+        });
+
+        picker.append(label, select);
+
+        details.insertBefore(
+            picker,
+            details.querySelector(".quick-view-buttons")
+        );
+
+        function selectVariant() {
+            const chosen = tnmGetProduct(
+                Number(select.value)
+            );
+
+            if (!chosen) return;
+
+            activeQuickViewProductId = chosen.id;
+
+            // Change the displayed picture.
+            const photo = document.getElementById(
+                "quick-view-image"
+            );
+
+            photo.src = chosen.image;
+            photo.alt = chosen.name.replace(
+                /<br\s*\/?>/gi,
+                " "
+            );
+
+            // Change the displayed name.
+            document.getElementById(
+                "quick-view-name"
+            ).textContent = chosen.name.replace(
+                /<br\s*\/?>/gi,
+                "\n"
+            );
+
+            // All variants share the original price.
+            document.getElementById(
+                "quick-view-price"
+            ).textContent = parent.price;
+
+            // Use the selected variant for cart controls.
+            updateQuickViewCartButton(chosen.id);
+
+            // Buy Now uses the selected variant.
+            document.getElementById(
+                "quick-view-buy"
+            ).onclick = function () {
+                closeQuickView();
+                buyNow(chosen.id);
+            };
+        }
+
+        select.addEventListener("change", selectVariant);
+        selectVariant();
+    };
+
+    // Safety: backend variant support is not enabled.
+    // Prevent an order from losing its selected design.
+
+    function warnVariantCheckout() {
+        alert(
+            "Variant checkout is not enabled yet. " +
+            "Your selected design is saved in your cart, " +
+            "but the order backend must be updated first."
+        );
+    }
+
+    const previousCheckoutForVariants = checkout;
+
+    checkout = function (...args) {
+        if (tnmCartHasVariant()) {
+            return warnVariantCheckout();
+        }
+
+        return previousCheckoutForVariants.apply(
+            this,
+            args
+        );
+    };
+
+    const previousPlaceOrderForVariants = placeOrder;
+
+    placeOrder = function (...args) {
+        if (tnmCartHasVariant()) {
+            return warnVariantCheckout();
+        }
+
+        return previousPlaceOrderForVariants.apply(
+            this,
+            args
+        );
+    };
+
+    // Also protect existing COD test/preview functions.
+    for (const key of [
+        "tnmTestCODOrder",
+        "tnmPreviewCODCheckout"
+    ]) {
+        const previous = window[key];
+
+        if (typeof previous !== "function") continue;
+
+        window[key] = function (...args) {
+            if (tnmCartHasVariant()) {
+                return warnVariantCheckout();
+            }
+
+            return previous.apply(this, args);
+        };
+    }
 })();
 
