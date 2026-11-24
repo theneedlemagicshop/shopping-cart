@@ -1,5 +1,12 @@
 const products = [
 
+    {
+    id: 83,
+    name: "Crochet Mesh Stitch Sweater",
+    categories: ["Clothing"],
+    price: 899 , // Cost price: ₹500 (750)
+    image: "images/image83.PNG"
+},
 
 {
     id: 82,
@@ -678,7 +685,10 @@ const products = [
 ];
 
 const productVideos = {
-    
+
+    83: [
+        "https://youtu.be/PZ1SXdO8o6I?si=Hi-gBUehfdYZhNCM"
+    ],
 
     82: [
         "https://youtu.be/E4ua3UJ485A?si=uY8_nE7lD4Eigc0v"
