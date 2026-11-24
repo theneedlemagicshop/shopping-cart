@@ -5,7 +5,7 @@ const products = [
     name: "Crochet Mesh Stitch Sweater",
     categories: ["Clothing"],
     price: 899 , // Cost price: ₹500 (750)
-    image: "images/image83.PNG"
+    image: "images/image83.png"
 },
 
 {
